@@ -2,11 +2,10 @@ package model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.ArrayList;
 
-public class TrafficLightController{
+
+public class TrafficLightController implements fineIssuer{
     private LocalDateTime intermittentStartTime;
     private LocalDateTime intermittentEndTime;
 
@@ -15,16 +14,17 @@ public class TrafficLightController{
     private Duration greenLightDuration;
     private Duration bothRedLightsDuration;
 
-    private final Set<TrafficLight> intersections = new HashSet<>();
-
+    private final ArrayList<TrafficLight> intersectionLights = new ArrayList<>(2);
+    // mainLight -> index=0
+    // secondaryLight -> index=1
 
     public TrafficLightController(Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
         this.redLightDuration = redLightDuration;
         this.yellowLightDuration = yellowLightDuration;
         this.greenLightDuration = greenLightDuration;
         this.bothRedLightsDuration = bothRedLightsDuration;
-        intersections.add(mainLight);
-        intersections.add(secondaryLight);
+        intersectionLights.add(0, mainLight);
+        intersectionLights.add(1, secondaryLight);
     }
 
     public TrafficLightController(LocalDateTime intermittentStartTime, LocalDateTime intermittentEndTime, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
@@ -34,61 +34,38 @@ public class TrafficLightController{
         this.yellowLightDuration = yellowLightDuration;
         this.greenLightDuration = greenLightDuration;
         this.bothRedLightsDuration = bothRedLightsDuration;
-        intersections.add(mainLight);
-        intersections.add(secondaryLight);
+        intersectionLights.add(mainLight);
+        intersectionLights.add(secondaryLight);
     }
 
-    public LocalDateTime getIntermittentStartTime() {
-        return intermittentStartTime;
-    }
-
-    public void setIntermittentStartTime(LocalDateTime intermittentStartTime) {
-        this.intermittentStartTime = intermittentStartTime;
-    }
-
-    public LocalDateTime getIntermittentEndTime() {
-        return intermittentEndTime;
-    }
-
-    public void setIntermittentEndTime(LocalDateTime intermittentEndTime) {
-        this.intermittentEndTime = intermittentEndTime;
-    }
-
-    public Duration getRedLightDuration() {
-        return redLightDuration;
-    }
-
-    public void setRedLightDuration(Duration redLightDuration) {
-        this.redLightDuration = redLightDuration;
-    }
-
-    public Duration getYellowLightDuration() {
-        return yellowLightDuration;
-    }
-
-    public void setYellowLightDuration(Duration yellowLightDuration) {
-        this.yellowLightDuration = yellowLightDuration;
-    }
-
-    public Duration getGreenLightDuration() {
-        return greenLightDuration;
-    }
-
-    public void setGreenLightDuration(Duration greenLightDuration) {
-        this.greenLightDuration = greenLightDuration;
-    }
-
+    //getters
+    public LocalDateTime getIntermittentStartTime() { return intermittentStartTime; }
+    public LocalDateTime getIntermittentEndTime() { return intermittentEndTime; }
+    public Duration getRedLightDuration() { return redLightDuration; }
+    public Duration getYellowLightDuration() { return yellowLightDuration; }
+    public Duration getGreenLightDuration() { return greenLightDuration; }
     public Duration getBothRedLightsDuration() {
         return bothRedLightsDuration;
     }
 
-    public void setBothRedLightsDuration(Duration bothRedLightsDuration) {
-        this.bothRedLightsDuration = bothRedLightsDuration;
-    }
+    //setters
+    public void setIntermittentStartTime(LocalDateTime intermittentStartTime) { this.intermittentStartTime = intermittentStartTime; }
+    public void setIntermittentEndTime(LocalDateTime intermittentEndTime) { this.intermittentEndTime = intermittentEndTime; }
+    public void setRedLightDuration(Duration redLightDuration) { this.redLightDuration = redLightDuration; }
+    public void setYellowLightDuration(Duration yellowLightDuration){ this.yellowLightDuration = yellowLightDuration; }
+    public void setGreenLightDuration(Duration greenLightDuration) {this.greenLightDuration = greenLightDuration; }
+    public void setBothRedLightsDuration(Duration bothRedLightsDuration) { this.bothRedLightsDuration = bothRedLightsDuration; }
 
     public void changeTrafficLightsIntermittent(){
-        for(TrafficLight f : intersections)
-            f.startIntermittentState();
+        intersectionLights.get(0).changeState(TrafficLightState.INTERMITTENT);
+        intersectionLights.get(1).changeState(TrafficLightState.INTERMITTENT);
     }
 
+    public void startTrafficLights(){
+        intersectionLights.get(0).changeState(TrafficLightState.GREEN);
+        intersectionLights.get(1).changeState(TrafficLightState.RED);
+    }
+
+    @Override
+    public void issueFine() {}
 }

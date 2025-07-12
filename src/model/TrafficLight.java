@@ -4,6 +4,7 @@ public class TrafficLight {
     private String street;
     private String orientation;
     private boolean isMain;
+    private TrafficLightState currentState;
 
     public TrafficLight(String street, String orientation, boolean isMain) {
         this.street = street;
@@ -11,15 +12,13 @@ public class TrafficLight {
         this.isMain = isMain;
     }
 
-    public boolean getIsMain(){return isMain;}
-    public String getStreet() {
-        return street;
-    }
-    public String getOrientation() {
-        return orientation;
-    }
+    //getters
+    public boolean getIsMain(){ return isMain; }
+    public String getStreet() { return street; }
+    public String getOrientation() { return orientation; }
+    public TrafficLightState getCurrentState(){ return currentState; }
 
-    public void changeColor(){}
+    public void changeState(TrafficLightState newState){ this.currentState = newState; }
+    public void fail(){ this.currentState = TrafficLightState.UNKNOWN;}
 
-    public void startIntermittentState(){}
 }
