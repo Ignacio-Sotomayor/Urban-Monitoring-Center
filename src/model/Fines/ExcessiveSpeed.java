@@ -1,4 +1,4 @@
-package model;
+package model.Fines;
 
 public class ExcessiveSpeed extends InfractionType {
     private double surchargePer10PercentExcess;

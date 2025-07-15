@@ -1,4 +1,4 @@
-package model;
+package model.Fines;
 
 public class EventGeolocation {
  private String id;

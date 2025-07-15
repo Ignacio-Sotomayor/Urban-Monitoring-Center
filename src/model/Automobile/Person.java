@@ -1,3 +1,5 @@
+package model.Automobile;
+
 public class Person {
     private String fullName;
     private String id;

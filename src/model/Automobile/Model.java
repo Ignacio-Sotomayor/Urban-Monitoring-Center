@@ -1,3 +1,5 @@
+package model.Automobile;
+
 public class Model implements Comparable<Model> {
     private String name;
 

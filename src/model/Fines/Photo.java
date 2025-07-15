@@ -1,4 +1,4 @@
-package model;
+package model.Fines;
 
 public class Photo {
     private String path;
