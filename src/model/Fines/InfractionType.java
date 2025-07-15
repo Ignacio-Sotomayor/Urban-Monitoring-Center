@@ -1,6 +1,6 @@
 package model.Fines;
 
-public class InfractionType {
+public abstract InfractionType {
  private String description;
  private double amount;
  private int scoring;

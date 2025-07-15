@@ -1,13 +1,13 @@
 package model.Automobile;
 
-public class Car {
+public class Automobile {
     private String licensePlate;
     private Person owner;
     private Brand brand;
     private Model model;
     private int year;
 
-    public Car(String licensePlate, Brand brand, Model model, Person owner, int year) {
+    public Automobile(String licensePlate, Brand brand, Model model, Person owner, int year) {
         this.licensePlate = licensePlate;
         this.brand = brand;
         this.model = model;

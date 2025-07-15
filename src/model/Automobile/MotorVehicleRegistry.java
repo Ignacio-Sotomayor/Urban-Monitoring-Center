@@ -4,25 +4,25 @@ import java.util.*;
 public class MotorVehicleRegistry {
     private String name;
     private Set<Brand> brands;
-    private List<Car> cars;
+    private List<Automobile> automobiles;
 
     public MotorVehicleRegistry(String name) {
         this.name = name;
         this.brands = new TreeSet<>();
-        this.cars = new ArrayList<>();
+        this.automobiles = new ArrayList<>();
     }
 
     public void addBrand(Brand brand) {
         brands.add(brand);
     }
 
-    public void addCar(Car car) {
-        cars.add(car);
+    public void addCar(Automobile automobile) {
+        automobiles.add(automobile);
     }
 
     public void showAllCars() {
-        for (Car car : cars) {
-            System.out.println(car);
+        for (Automobile automobile : automobiles) {
+            System.out.println(automobile);
         }
     }
 
@@ -57,15 +57,15 @@ public class MotorVehicleRegistry {
         Person carol = new Person("Carol White", "34567890", "789 Maple Blvd");
 
         // Cars
-        Car car1 = new Car("ABC123", toyota, corolla, alice, 2020);
-        Car car2 = new Car("XYZ789", ford, ranger, bob, 2022);
-        Car car3 = new Car("LMN456", chevrolet, onix, carol, 2019);
-        Car car4 = new Car("QWE987", toyota, hilux, alice, 2021);
+        Automobile automobile1 = new Automobile("ABC123", toyota, corolla, alice, 2020);
+        Automobile automobile2 = new Automobile("XYZ789", ford, ranger, bob, 2022);
+        Automobile automobile3 = new Automobile("LMN456", chevrolet, onix, carol, 2019);
+        Automobile automobile4 = new Automobile("QWE987", toyota, hilux, alice, 2021);
 
-        registry.addCar(car1);
-        registry.addCar(car2);
-        registry.addCar(car3);
-        registry.addCar(car4);
+        registry.addCar(automobile1);
+        registry.addCar(automobile2);
+        registry.addCar(automobile3);
+        registry.addCar(automobile4);
 
         // Show all cars
         registry.showAllCars();
