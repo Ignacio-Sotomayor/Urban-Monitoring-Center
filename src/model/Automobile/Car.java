@@ -1,3 +1,5 @@
+package model.Automobile;
+
 public class Car {
     private String licensePlate;
     private Person owner;

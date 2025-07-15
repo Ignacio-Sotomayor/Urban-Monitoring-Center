@@ -1,3 +1,4 @@
+package model.Automobile;
 import java.util.*;
 
 public class MotorVehicleRegistry {
