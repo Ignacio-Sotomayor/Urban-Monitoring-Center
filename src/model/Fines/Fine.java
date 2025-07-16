@@ -1,7 +1,6 @@
 package model.Fines;
 import java.util.HashSet;
 import java.util.Set;
-import model.Automobile;
 import model.Automobile.Automobile;
 
 public class Fine {
@@ -27,9 +26,6 @@ public class Fine {
         photos.add(photo);
     }
 
-    public Set<Photo> getPhotos() {
-        return photos;
-    }
 
     public double getAmount() {
         return amount;

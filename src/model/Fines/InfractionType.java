@@ -1,9 +1,12 @@
 package model.Fines;
 
-public abstract InfractionType {
+import model.Automobile.Automobile;
+
+public abstract class InfractionType {
  private String description;
  private double amount;
  private int scoring;
+ private Automobile automobile;
 
  public InfractionType(String description, double amount, int scoring) {
   this.description = description;
