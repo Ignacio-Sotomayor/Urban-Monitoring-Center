@@ -1,12 +1,14 @@
 package model.Fines;
 
+import model.Automobile.Automobile;
+
 public class ExcessiveSpeedFine extends Fine {
     private int automobileSpeed;
     private int speedLimit;
 
     public ExcessiveSpeedFine(double amount, int scoring, EventGeolocation eventGeolocation,
-                              InfractionType infractionType, int automobileSpeed, int speedLimit) {
-        super(amount, scoring, eventGeolocation, infractionType);
+                              InfractionType infractionType, Automobile automobile, int automobileSpeed, int speedLimit) {
+        super(amount, scoring, eventGeolocation, infractionType, automobile);
         this.automobileSpeed = automobileSpeed;
         this.speedLimit = speedLimit;
     }
