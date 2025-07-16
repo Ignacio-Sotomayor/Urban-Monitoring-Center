@@ -1,6 +1,7 @@
 package model;
 
 public class SecurityCamera extends Device{
+
     public SecurityCamera() {
         super();
     }

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 
-public class TrafficLightController implements fineIssuer{
+public class TrafficLightController extends Device implements fineIssuer{
     private LocalDateTime intermittentStartTime;
     private LocalDateTime intermittentEndTime;
 
@@ -18,7 +18,8 @@ public class TrafficLightController implements fineIssuer{
     // mainLight -> index=0
     // secondaryLight -> index=1
 
-    public TrafficLightController(Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
+    public TrafficLightController(int ID, String address, State state, Location location,Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
+        super(ID,address,state,location);
         this.redLightDuration = redLightDuration;
         this.yellowLightDuration = yellowLightDuration;
         this.greenLightDuration = greenLightDuration;
