@@ -1,6 +1,6 @@
 package model;
 
-public class Radar extends Device{ //implementa emisor multa
+public class Radar extends Device implements fineIssuer{
     private double speedLimit;
 
     public Radar() {
@@ -13,5 +13,10 @@ public class Radar extends Device{ //implementa emisor multa
 
     public void setSpeedLimit(double speedLimit) {
         this.speedLimit = speedLimit;
+    }
+
+    @Override
+    public void issueFine() {
+
     }
 }
