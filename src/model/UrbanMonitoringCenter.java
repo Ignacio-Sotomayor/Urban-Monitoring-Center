@@ -1,5 +1,6 @@
 package model;
-
+import model.Device;
+import model.Service;
 import java.util.*;
 
 public class UrbanMonitoringCenter {
