@@ -47,7 +47,7 @@ This project is extensible and designed for integration with:
 - Real-time data feeds
 - Data persistence
 - Multithreading
-- Graphical user interface
+- Graphical user interface using GMapsFX for the live map view
 - Expanded device types and violation categories
 
 ---
