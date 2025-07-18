@@ -1,4 +1,4 @@
-package model;
+package model.Devices;
 
 public class Location {
     private double latitude, longitude;

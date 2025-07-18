@@ -1,13 +1,12 @@
-package model;
+package model.Devices;
 
-public class Radar extends Device implements fineIssuer{
+import model.UrbanMonitoringCenter;
+
+public class Radar extends FineIssuerDevice {
     private double speedLimit;
 
-    public Radar() {
-    }
-
-    public Radar(int ID, String address, State state, Location location, double speedLimit) {
-        super(ID, address, state, location);
+    public Radar( String address, Location location, double speedLimit) {
+        super(address, location, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("ExcessiveSpeed"));
         this.speedLimit = speedLimit;
     }
 
@@ -15,8 +14,5 @@ public class Radar extends Device implements fineIssuer{
         this.speedLimit = speedLimit;
     }
 
-    @Override
-    public void issueFine() {
 
-    }
 }

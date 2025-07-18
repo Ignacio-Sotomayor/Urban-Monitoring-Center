@@ -1,6 +1,6 @@
 package model.Automobile;
 
-public class Automobile {
+public class Automobile implements Comparable<Automobile>{
     private String licensePlate;
     private Person owner;
     private Brand brand;
@@ -15,29 +15,33 @@ public class Automobile {
         this.year = year;
     }
 
+    //getters
     public int getYear() {
         return year;
     }
-
     public String getLicensePlate() {
         return licensePlate;
     }
-
     public Person getOwner() {
         return owner;
     }
-
     public Brand getBrand() {
         return brand;
     }
-
     public Model getModel() {
         return model;
     }
 
     @Override
     public String toString() {
-        return "License plate: " + licensePlate + ", owner=" + owner + ", brand=" + brand.getName() + ", model=" + model.getName() +
-                ", year=" + year;
+        return String.format("%s model %s %d of %s with the license plate: %s",brand,model,year,owner.getFullName(),licensePlate);
+    }
+
+    public boolean equals(Automobile other){
+        return this.licensePlate.equalsIgnoreCase(other.getLicensePlate());
+    }
+
+    public int compareTo(Automobile other){
+        return this.licensePlate.compareTo(((Automobile)other).licensePlate);
     }
 }

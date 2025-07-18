@@ -1,15 +1,17 @@
-package model;
+package model.Devices;
 
-public class ParkingLotSecurityCamera extends Device implements fineIssuer{
-    private double ToleranceTime;
+import model.UrbanMonitoringCenter;
 
-    public ParkingLotSecurityCamera(int ID, String address, State state, Location location, double toleranceTime) {
-        super(ID, address, state, location);
-        ToleranceTime = toleranceTime;
+import java.time.Duration;
+
+public class ParkingLotSecurityCamera extends FineIssuerDevice {
+    private Duration toleranceTime;
+
+    public ParkingLotSecurityCamera( String address, Location location, Duration toleranceTime) {
+        super(address, location, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("ParkingOvertime"));
+        this.toleranceTime = toleranceTime;
     }
 
-    @Override
-    public void issueFine() {
 
-    }
+
 }

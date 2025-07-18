@@ -4,21 +4,24 @@ import model.Fines.*;
 import java.util.*;
 
 public class MotorVehicleRegistry {
-    private String name;
+    private static String name = "Mar del Plata Car Dealership";
     private Set<Brand> brands;
-    private List<Automobile> automobiles;
-    private Map<String,List<Fine>> finesMap;
+    private Map<Automobile,List<Fine>> automobilesInformation;
+    private static MotorVehicleRegistry instance = null;
 
-    public MotorVehicleRegistry(String name) {
-        this.name = name;
+    private MotorVehicleRegistry(){
         this.brands = new TreeSet<>();
-        this.automobiles = new ArrayList<>();
-        this.finesMap = new TreeMap<String,List<Fine>>();
+        this.automobilesInformation = new TreeMap<Automobile,List<Fine>>();
     }
 
+    public static MotorVehicleRegistry getMotorVehicleRegistry(){
+        if(instance == null)
+            instance = new MotorVehicleRegistry();
+        return instance;
+    }
 
-    public static void main(String[] args) {
-        MotorVehicleRegistry registry = new MotorVehicleRegistry("Mar del Plata Car Dealership");
+    public static void Initialize() {
+        MotorVehicleRegistry registry = getMotorVehicleRegistry();
 
         Brand toyota = new Brand("Toyota");
         Model corolla = new Model("Corolla");
@@ -57,62 +60,42 @@ public class MotorVehicleRegistry {
         registry.addAutomobile(car2);
         registry.addAutomobile(car3);
         registry.addAutomobile(car4);
-
-        ExcessiveSpeedFine f1 = new ExcessiveSpeedFine(1000, 1,
-                new EventGeolocation("A001", "2025/05/06 08:23",
-                "Ituzaingo 1320"),
-                new ExcessiveSpeed("Excessive speed", 1000,1,100),
-                car1,70,60);
-        ExcessiveSpeedFine f2 = new ExcessiveSpeedFine(3000, 1,
-                new EventGeolocation("A001", "2025/05/06 08:23",
-                        "Ituzaingo 1320"),
-                new ExcessiveSpeed("Excessive speed", 1000,1,100),
-                car1,80,60);
-
-        registry.addFineToAutomobil(car1.getLicensePlate(),f1);
-        registry.addFineToAutomobil(car1.getLicensePlate(),f2);
-
-
-        // Show all Automobiles
-        registry.showAllAutomobiles();
-        //Show the Scoring of a particular automobile
-        System.out.println("The scoring of the car with license Plate: "+car1.getLicensePlate()+", is: "+registry.getScoring(car1.getLicensePlate()));
     }
 
-    public void addBrand(Brand brand) {
-        brands.add(brand);
+    public Automobile getRandomAutomobile(){
+        Random random = new Random();
+        ArrayList<Automobile> automobiles = new ArrayList<>(automobilesInformation.keySet());
+        return automobiles.get(random.nextInt(automobiles.size()));
     }
 
-
-    public void addAutomobile(Automobile a) {
-        automobiles.add(a);
-    }
-
+    public void addBrand(Brand brand) { brands.add(brand); }
+    public void addAutomobile(Automobile a) { automobilesInformation.put(a,new ArrayList<>()); }
+    public void addFineToAutomobile(Automobile a, Fine f) { automobilesInformation.get(a).add(f); }
 
     public void showAllAutomobiles() {
-        for (Automobile a : automobiles) {
+        for (Automobile a : automobilesInformation.keySet()) {
             System.out.println(a);
         }
     }
 
-    public void addFineToAutomobil(String licensePlate,Fine f) {
-         List<Fine> fines = finesMap.get(licensePlate);
-         if (fines == null) {
-             fines = new ArrayList<>();
-             finesMap.put(licensePlate,fines);
-         }
-         fines.add(f);
-    }
-
-    public int getScoring(String licensePlate) {
+    public int getScoring(Automobile a) {
         int scoring = 20;
-        List<Fine> fines = finesMap.get(licensePlate);
-
-        if (fines != null) {
-            for (Fine f : fines) {
-                scoring-=f.getScoring();
-            }
+        List<Fine> fines = automobilesInformation.get(a);
+        for (Fine f : fines) {
+            scoring-=f.getScoring();
         }
         return scoring;
+    }
+
+    public void informFines() {
+        Iterator<Automobile> it = automobilesInformation.keySet().iterator();
+        while(it.hasNext()) {
+            Automobile actualAutomobile = it.next();
+            System.out.format("The %s has the next fines: \n",actualAutomobile.toString() );
+            for(Fine f : automobilesInformation.get(actualAutomobile)){
+                System.out.format("\t %s \n", f.toString());
+            }
+            System.out.println('\n');
+        }
     }
 }

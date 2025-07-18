@@ -11,6 +11,7 @@ public class Model implements Comparable<Model> {
         return name;
     }
 
+    //setters
     public void setName(String name) {
         this.name = name;
     }

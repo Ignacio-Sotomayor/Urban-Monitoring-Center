@@ -15,10 +15,10 @@ public class Brand implements Comparable<Brand> {
         models.add(model);
     }
 
+    //getters
     public String getName() {
         return name;
     }
-
     public Set<Model> getModels() {
         return models;
     }

@@ -1,12 +1,8 @@
-package model;
+package model.Devices;
 
 public class SecurityCamera extends Device{
 
-    public SecurityCamera() {
-        super();
-    }
-
-    public SecurityCamera(int ID, String address, State state, Location location) {
-        super(ID, address, state, location);
+    public SecurityCamera( String address, Location location) {
+        super(address, location);
     }
 }

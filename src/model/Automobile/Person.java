@@ -1,5 +1,7 @@
 package model.Automobile;
 
+import model.SecurityNotice;
+
 public class Person {
     private String fullName;
     private String id;
@@ -11,16 +13,19 @@ public class Person {
         this.address = address;
     }
 
+    //getters
     public String getFullName() {
         return fullName;
     }
-
     public String getId() {
         return id;
     }
-
     public String getAddress() {
         return address;
+    }
+
+    public boolean equals(Person other) {
+        return this.id == other.getId();
     }
 
     @Override

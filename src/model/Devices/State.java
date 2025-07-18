@@ -1,6 +1,6 @@
-package model;
+package model.Devices;
 
-public class State{
-    public State() {
-    }
+public enum State {
+    OPERATIVE,
+    INOPERATIVE
 }

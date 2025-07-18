@@ -1,4 +1,5 @@
-package model;
+package model.Devices;
+import model.Devices.TrafficLightState;
 
 public class TrafficLight {
     private String street;
@@ -19,6 +20,5 @@ public class TrafficLight {
     public TrafficLightState getCurrentState(){ return currentState; }
 
     public void changeState(TrafficLightState newState){ this.currentState = newState; }
-    public void fail(){ this.currentState = TrafficLightState.UNKNOWN;}
 
 }

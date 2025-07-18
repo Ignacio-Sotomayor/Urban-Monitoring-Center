@@ -7,10 +7,12 @@ public class Photo {
         this.path = path;
     }
 
+    //getters
     public String getPath() {
         return path;
     }
 
+    //setters
     public void setPath(String path) {
         this.path = path;
     }

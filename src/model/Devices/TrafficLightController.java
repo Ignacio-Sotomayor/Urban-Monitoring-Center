@@ -1,13 +1,17 @@
-package model;
+package model.Devices;
+
+import model.Devices.TrafficLightState;
+import model.UrbanMonitoringCenter;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 
-public class TrafficLightController extends Device implements fineIssuer{
-    private LocalDateTime intermittentStartTime;
-    private LocalDateTime intermittentEndTime;
+public class TrafficLightController extends FineIssuerDevice implements Runnable{
+    private @Nullable LocalDateTime intermittentStartTime;
+    private @Nullable LocalDateTime intermittentEndTime;
 
     private Duration redLightDuration;
     private Duration yellowLightDuration;
@@ -18,8 +22,8 @@ public class TrafficLightController extends Device implements fineIssuer{
     // mainLight -> index=0
     // secondaryLight -> index=1
 
-    public TrafficLightController(int ID, String address, State state, Location location,Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
-        super(ID,address,state,location);
+    public TrafficLightController( String address, Location location, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
+        super(address, location, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
         this.redLightDuration = redLightDuration;
         this.yellowLightDuration = yellowLightDuration;
         this.greenLightDuration = greenLightDuration;
@@ -28,7 +32,18 @@ public class TrafficLightController extends Device implements fineIssuer{
         intersectionLights.add(1, secondaryLight);
     }
 
-    public TrafficLightController(LocalDateTime intermittentStartTime, LocalDateTime intermittentEndTime, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
+    public TrafficLightController(String address, Location location, TrafficLight mainLight, TrafficLight secondaryLight){
+        super(address, location, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+        redLightDuration = Duration.ofSeconds(30);
+        yellowLightDuration = Duration.ofSeconds(4);
+        greenLightDuration = Duration.ofSeconds(40);
+        bothRedLightsDuration = Duration.ofSeconds(3);
+        intersectionLights.add(0, mainLight);
+        intersectionLights.add(1, secondaryLight);
+    }
+
+    public TrafficLightController(String address, Location location, LocalDateTime intermittentStartTime, LocalDateTime intermittentEndTime, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
+        super(address, location, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
         this.intermittentStartTime = intermittentStartTime;
         this.intermittentEndTime = intermittentEndTime;
         this.redLightDuration = redLightDuration;
@@ -68,5 +83,7 @@ public class TrafficLightController extends Device implements fineIssuer{
     }
 
     @Override
-    public void issueFine() {}
+    public void run() {
+
+    }
 }

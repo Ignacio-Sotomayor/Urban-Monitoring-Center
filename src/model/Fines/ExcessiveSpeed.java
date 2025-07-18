@@ -1,7 +1,5 @@
 package model.Fines;
 
-import model.Automobile.Automobile;
-
 public class ExcessiveSpeed extends InfractionType {
     private double surchargePer10PercentExcess;
 
@@ -17,6 +15,20 @@ public class ExcessiveSpeed extends InfractionType {
     public void setSurchargePer10PercentExcess(double surchargePer10PercentExcess) {
         this.surchargePer10PercentExcess = surchargePer10PercentExcess;
     }
+
+    public void calculateImportScoring(double automobileSpeed, double speedLimit){
+        double imp = getAmount();
+        int score = getScoring(), Excess = (int)((automobileSpeed - speedLimit)/(speedLimit * 0.1));
+
+        for(int i=0; i<Excess; i++){
+          imp += this.surchargePer10PercentExcess;
+          score += 1;
+        }
+
+        setAmount(imp);
+        setScoring(score);
+    }
+
 
     @Override
     public String toString() {
