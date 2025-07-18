@@ -6,7 +6,6 @@ public class InfractionType {
     private String description;
     private double amount;
     private int scoring;
-    private Automobile automobile;
 
     public InfractionType(String description, double amount, int scoring) {
         this.description = description;
@@ -24,8 +23,4 @@ public class InfractionType {
     public void setAmount(double amount) { this.amount = amount; }
     public void setScoring(int scoring) { this.scoring = scoring; }
 
-    @Override
-    public String toString() {
-        return "InfractionType [description=" + description + ", amount=" + amount + ", scoring=" + scoring + "]";
-    }
 }

@@ -12,6 +12,4 @@ public class ParkingLotSecurityCamera extends FineIssuerDevice {
         this.toleranceTime = toleranceTime;
     }
 
-
-
 }

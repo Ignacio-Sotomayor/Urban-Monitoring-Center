@@ -6,7 +6,7 @@ import model.Automobile.Automobile;
 public class Fine {
     private double amount;
     private int scoring;
-    private Set<Photo> photos; // no duplicates
+    private Set<Photo> photos; 
     private EventGeolocation eventGeolocation;
     private InfractionType infractionType;
     private Automobile automobile;
