@@ -12,17 +12,15 @@ public class ExcessiveSpeed extends InfractionType {
         return surchargePer10PercentExcess;
     }
 
-    public void setSurchargePer10PercentExcess(double surchargePer10PercentExcess) {
-        this.surchargePer10PercentExcess = surchargePer10PercentExcess;
-    }
 
     public void calculateImportScoring(double automobileSpeed, double speedLimit){
         double imp = getAmount();
-        int score = getScoring(), Excess = (int)((automobileSpeed - speedLimit)/(speedLimit * 0.1));
+        int score = getScoring();
+        int Excess = (int)((automobileSpeed - speedLimit)/(speedLimit * 0.1));
 
         for(int i=0; i<Excess; i++){
-          imp += this.surchargePer10PercentExcess;
-          score += 1;
+            imp += this.surchargePer10PercentExcess;
+            score += 1;
         }
 
         setAmount(imp);

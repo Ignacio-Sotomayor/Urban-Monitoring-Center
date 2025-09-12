@@ -1,15 +1,13 @@
 package com.model.Automobile;
 
-import com.model.SecurityNotice;
-
-public class Person {
+public class Owner {
     private String fullName;
-    private String id;
+    private String legalIid;
     private String address;
 
-    public Person(String fullName, String id, String address) {
+    public Owner(String fullName, String legalIid, String address) {
         this.fullName = fullName;
-        this.id = id;
+        this.legalId = legalIid;
         this.address = address;
     }
 
@@ -17,19 +15,19 @@ public class Person {
     public String getFullName() {
         return fullName;
     }
-    public String getId() {
-        return id;
+    public String getLegalIid() {
+        return legalIid;
     }
     public String getAddress() {
         return address;
     }
 
-    public boolean equals(Person other) {
-        return this.id == other.getId();
+    public boolean equals(Owner other) {
+        return this.legalIid == other.getLegalIid();
     }
 
     @Override
     public String toString() {
-        return fullName + " (ID: " + id + ")";
+        return fullName + " (ID: " + legalIid + ")";
     }
 }

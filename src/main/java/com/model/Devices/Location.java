@@ -7,4 +7,11 @@ public class Location {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+        builder.append(latitude);
+        builder.append(longitude);
+        return builder.toString();
+    }
 }

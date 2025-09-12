@@ -7,29 +7,25 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class EventGeolocation {
-    private int id;
-    private LocalDateTime dateHour;
+    private LocalDateTime dateTime;
     private String address;
     private Device device;
     private Location location;
-    private static int lastID = -1;
 
 
-    public EventGeolocation( LocalDateTime dateHour, String address, Location location, Device device) {
-        this.id = ++lastID;
-        this.dateHour = dateHour;
+    public EventGeolocation(LocalDateTime dateTime, String address, Location location, Device device) {
+        this.dateTime = dateTime;
         this.address = address;
         this.device = device;
         this.location = location;
     }
 
     //getters
-    public int getId() {return id;}
-    public LocalDateTime getDateHour() {
-  return dateHour;
+    public LocalDateTime getDateTime() {
+  return dateTime;
  }
-    public void setDateHour(LocalDateTime dateHour) {
-  this.dateHour = dateHour;
+    public void setDateTime(LocalDateTime dateTime) {
+  this.dateTime = dateTime;
  }
     public String getAddress() {
   return address;
@@ -42,6 +38,6 @@ public class EventGeolocation {
 
     @Override
     public String toString() {
-        return String.format("%s %s",dateHour.format(DateTimeFormatter.ISO_DATE_TIME),address);
+        return String.format("%s \t %s \t %s", dateTime.format(DateTimeFormatter.ISO_DATE_TIME),address,location.toString());
     }
 }

@@ -46,9 +46,9 @@ public class MotorVehicleRegistry {
         registry.addBrand(chevrolet);
 
         // People
-        Person alice = new Person("Alice Johnson", "32145678", "123 Elm Street");
-        Person bob = new Person("Bob Smith", "23456789", "456 Oak Avenue");
-        Person carol = new Person("Carol White", "34567890", "789 Maple Blvd");
+        Owner alice = new Owner("Alice Johnson", "32145678", "123 Elm Street");
+        Owner bob = new Owner("Bob Smith", "23456789", "456 Oak Avenue");
+        Owner carol = new Owner("Carol White", "34567890", "789 Maple Blvd");
 
         // Automobiles
         Automobile car1 = new Automobile("ABC123", toyota, corolla, alice, 2020);
@@ -91,7 +91,7 @@ public class MotorVehicleRegistry {
         Iterator<Automobile> it = automobilesInformation.keySet().iterator();
         while(it.hasNext()) {
             Automobile actualAutomobile = it.next();
-            System.out.format("The %s has the next fines: \n",actualAutomobile.toString() );
+            System.out.format("THE %s has the next fines: \n",actualAutomobile.toString() );
             for(Fine f : automobilesInformation.get(actualAutomobile)){
                 System.out.format("\t %s \n", f.toString());
             }

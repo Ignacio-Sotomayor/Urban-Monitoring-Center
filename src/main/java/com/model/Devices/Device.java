@@ -2,29 +2,50 @@ package com.model.Devices;
 
 import com.model.UrbanMonitoringCenter;
 
+import java.util.Objects;
+import java.util.UUID;
+
 public abstract class Device {
-    private static int lastId=0;
-    private int id;
+    private UUID id;
     private String address;
-    private State state;
+    private DeviceState state;
     private Location location;
 
     public Device (String address, Location location){
-        this.id = lastId++;
+        this.id = UUID.randomUUID();
         this.address = address;
-        this.state = State.OPERATIVE;
+        this.state = DeviceState.OPERATIVE;
+        this.location = location;
+    }
+
+    public Device(String ID, String address, DeviceState state, Location location){
+        this.id = UUID.fromString(ID);
+        this.address = address;
+        this.state = state;
         this.location = location;
     }
 
     //getters
     public Location getLocation() { return this.location; }
     public String getAddress() { return this.address; }
-    public int getId() { return id; }
-    public State getState(){ return state; }
+    public String getId() { return id.toString(); }
+    public DeviceState getState(){ return state; }
 
     public void fail(){
-        this.state = State.INOPERATIVE;
+        this.state = DeviceState.INOPERATIVE;
         System.out.format("The device %d stopped working \n",id);
         UrbanMonitoringCenter.getUrbanMonitoringCenter().issuedDevices(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Device device = (Device) o;
+        return Objects.equals(id, device.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

@@ -1,6 +1,6 @@
 package com.model.Devices;
 
-public enum State {
+public enum DeviceState {
     OPERATIVE,
     INOPERATIVE
 }

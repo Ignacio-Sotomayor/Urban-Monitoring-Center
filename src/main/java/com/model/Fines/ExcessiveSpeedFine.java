@@ -16,14 +16,8 @@ public class ExcessiveSpeedFine extends Fine {
     public int getAutomobileSpeed() {
         return automobileSpeed;
     }
-    public void setAutomobileSpeed(int automobileSpeed) {
-        this.automobileSpeed = automobileSpeed;
-    }
     public int getSpeedLimit() {
         return speedLimit;
-    }
-    public void setSpeedLimit(int speedLimit) {
-        this.speedLimit = speedLimit;
     }
 
     @Override

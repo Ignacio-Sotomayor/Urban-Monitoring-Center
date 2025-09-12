@@ -5,7 +5,6 @@ import com.model.Devices.Device;
 import com.model.Devices.FineIssuerDevice;
 import com.model.Devices.Location;
 import com.model.Fines.EventGeolocation;
-import com.model.UrbanMonitoringCenter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +25,7 @@ public class Main {
 
         Device d;
         for (int i = 0; i < 4; i++) {
-            d = UMC.getRandomDevice();
+            d=UMC.getRandomDevice();
             d.fail();
         }
 

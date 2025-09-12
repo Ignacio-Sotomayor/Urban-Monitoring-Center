@@ -5,7 +5,7 @@
 Represents an individual who owns a vehicle registered in the `Motor Vehicle Registry`.
 - **Fields:**
   - `fullName`: String - Stores the full name of the car owner.
-  - `id`: String - Unique identifier for each owner. In Argentina, this conveniently corresponds to the national identity document (DNI).
+  - `legalIid`: String - Unique identifier for each owner. In Argentina, this conveniently corresponds to the national identity document (DNI).
   - `address`: String - Specifies the residential address of the vehicle owner.
 -----
 #### Class Brand
@@ -57,8 +57,8 @@ Inherits from `InfractionType`. Encapsulates specific data related to fines issu
 #### Class EventGeolocation
 Captures the spatiotemporal details of an event within the system.
 - **Fields:**
-  - `id`: String - Unique identifier for each event.
-  - `dateHour`: DateTime - Records the exact timestamp when the event occurred, formatted as dd/MM/yyyy HH:mm:ss.
+  - `legalIid`: String - Unique identifier for each event.
+  - `dateTime`: DateTime - Records the exact timestamp when the event occurred, formatted as dd/MM/yyyy HH:mm:ss.
   - `address`: String - Stores the street name and number of the event location.
   - `location`: Location - Provides precise geographic coordinates where the event took place.
 -----
@@ -88,7 +88,7 @@ Encapsulates precise geographic coordinates data for spatial reference within th
 #### Abstract Class Device
 Encapsulates the general attributes of all the devices that conform the system. Intend for extension by specific types of devices.
 - **Fields:**
-  - `id`: int - Unique indentifier for each device.
+  - `legalIid`: int - Unique indentifier for each device.
   - `address`: String - Stores the street name and number where the device is physically installed.
   - `state`: State - Indicates the operational status of the device
   - `location`: Location - Provides precise geographic coordinates for the device’s placement.

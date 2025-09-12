@@ -73,7 +73,7 @@
                 <executions>
                     <execution>
                         <!-- Default configuration for running with: mvn clean javafx:run -->
-                        <id>default-cli</id>
+                        <legalIid>default-cli</legalIid>
                         <configuration>
                             <mainClass>com.urbanmonitoringcenter/com.view.HelloApplication</mainClass>
                             <launcher>app</launcher>

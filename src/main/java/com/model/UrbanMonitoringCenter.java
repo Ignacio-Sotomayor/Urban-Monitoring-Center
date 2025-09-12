@@ -70,7 +70,7 @@ public class UrbanMonitoringCenter {
         Iterator<SecurityNotice> it = securityNotices.iterator();
         while(it.hasNext()){
             SecurityNotice actual = it.next();
-            System.out.format("A %s ocurred in %s at the %s", actual.getDescription(), actual.getEventGeolocation().getAddress(), actual.getEventGeolocation().getDateHour().format(DateTimeFormatter.ISO_DATE_TIME));
+            System.out.format("A %s ocurred in %s at the %s", actual.getDescription(), actual.getEventGeolocation().getAddress(), actual.getEventGeolocation().getDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
         }
     }
 
