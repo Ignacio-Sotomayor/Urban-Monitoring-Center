@@ -1,10 +1,10 @@
 package com.model.Fines;
 
 public class ExcessiveSpeed extends InfractionType {
-    private double surchargePer10PercentExcess;
+    private final double surchargePer10PercentExcess;
 
     public ExcessiveSpeed(String description, double amount, int scoring,double surchargePer10PercentExcess) {
-        super(description, amount, scoring);
+        super("Speeding",description, amount, scoring);
         this.surchargePer10PercentExcess = surchargePer10PercentExcess;
     }
 

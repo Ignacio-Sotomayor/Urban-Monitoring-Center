@@ -28,7 +28,7 @@ public abstract class Device {
     //getters
     public Location getLocation() { return this.location; }
     public String getAddress() { return this.address; }
-    public String getId() { return id.toString(); }
+    public UUID getId() { return id; }
     public DeviceState getState(){ return state; }
 
     public void fail(){

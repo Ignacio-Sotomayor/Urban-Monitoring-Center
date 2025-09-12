@@ -1,9 +1,10 @@
 package com.model.Fines;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import com.model.Automobile.Automobile;
 
-public class Fine {
+public class Fine implements Serializable {
     private double amount;
     private int scoring;
     private Set<Photo> photos; 

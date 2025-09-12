@@ -1,9 +1,11 @@
 package com.model.Devices;
 
-public class Location {
-    private double latitude, longitude;
+import java.math.BigDecimal;
 
-    public Location(double latitude, double longitude) {
+public class Location {
+    private BigDecimal latitude, longitude;
+
+    public Location(BigDecimal latitude, BigDecimal longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }

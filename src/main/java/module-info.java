@@ -5,6 +5,7 @@ module com.view {
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
     requires org.jetbrains.annotations;
+    requires java.sql;
 
     opens com.view to javafx.fxml;
     exports com.view;

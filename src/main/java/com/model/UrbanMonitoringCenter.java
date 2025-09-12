@@ -10,16 +10,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class UrbanMonitoringCenter {
-    private List<Device> workingDevices;
-    private List<Device> issuedDevices;
+    private static Map<UUID,Device> workingDevices;
+    private static Map<UUID,Device> issuedDevices;
     private Set<SecurityNotice> securityNotices;
     private Map<String,InfractionType> infractionTypes;
 
     private static UrbanMonitoringCenter instance=null;
 
     private UrbanMonitoringCenter(){
-        workingDevices = new ArrayList<>();
-        issuedDevices = new ArrayList<>();
+        workingDevices = new HashMap<>();
+        issuedDevices = new HashMap<>();
         securityNotices = new TreeSet<>();
         infractionTypes = new HashMap<>();
     }
@@ -33,7 +33,14 @@ public class UrbanMonitoringCenter {
         return instance;
     }
     public InfractionType getSpecificInfractionType(String key){ return infractionTypes.get(key); }
-    public List<Device> getWorkingDevices() { return workingDevices; }
+    public static Device getSpecificDevice(UUID uuid){
+
+        Device device = workingDevices.get(uuid);
+        if(device == null)
+            device = issuedDevices.get(uuid);
+        return device;
+    }
+    public List<Device> getWorkingDevices() { return workingDevices.values().stream().toList(); }
     public Iterator<SecurityNotice> getSecurityNotices() { return securityNotices.iterator(); }
 
     public Device getRandomDevice(){
@@ -41,7 +48,7 @@ public class UrbanMonitoringCenter {
         return workingDevices.get(random.nextInt(workingDevices.size()));
     }
     public FineIssuerDevice getRandomFineIssuerDevice() {
-        List<FineIssuerDevice> fineIssuers = workingDevices.stream()
+        List<FineIssuerDevice> fineIssuers = workingDevices.values().stream()
                 .filter(d -> d instanceof FineIssuerDevice)
                 .map(d -> (FineIssuerDevice) d)
                 .collect(Collectors.toList());
@@ -54,15 +61,15 @@ public class UrbanMonitoringCenter {
         return fineIssuers.get(random.nextInt(fineIssuers.size()));
     }
     public void issuedDevices(Device d){
-        if(! workingDevices.isEmpty() && workingDevices.contains(d)) {
+        if(! workingDevices.isEmpty() && workingDevices.values().contains(d)) {
             workingDevices.remove(d);
-            issuedDevices.add(d);
+            issuedDevices.put(d.getId(),d);
         }
     }
     public void repairDevices(Device d){
-        if(! issuedDevices.isEmpty() && issuedDevices.contains(d)){
+        if(! issuedDevices.isEmpty() && issuedDevices.values().contains(d)){
             issuedDevices.remove(d);
-            workingDevices.add(d);
+            workingDevices.put(d.getId(),d);
         }
     }
 
@@ -77,9 +84,9 @@ public class UrbanMonitoringCenter {
     public static void Initialize(){
         UrbanMonitoringCenter UMC = getUrbanMonitoringCenter();
         //InfractionType
-        UMC.infractionTypes.put("CrossingRedLight", new InfractionType("The automobile was captured crossing a red Light",141600,5));
+        UMC.infractionTypes.put("RedLightViolation", new InfractionType("RedLightViolation","The automobile was captured crossing a red Light",141600,5));
         UMC.infractionTypes.put("ExcessiveSpeed", new ExcessiveSpeed("The automobile was captured driving over the speed limit",217800,2,20));
-        UMC.infractionTypes.put("ParkingOvertime", new InfractionType("The automobile was captured parking in a forbidden place for too much time",70800,3));
+        UMC.infractionTypes.put("ParkingOverTime", new InfractionType("ParkingOverTime","The automobile was captured parking in a forbidden place for too much time",70800,3));
         //Vehicles
         MotorVehicleRegistry.Initialize();
 
