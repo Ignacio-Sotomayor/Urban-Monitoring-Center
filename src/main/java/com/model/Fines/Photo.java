@@ -1,7 +1,7 @@
 package com.model.Fines;
 
 public class Photo {
-    private String path;
+    private final String path;
 
     public Photo(String path) {
         this.path = path;
@@ -10,11 +10,6 @@ public class Photo {
     //getters
     public String getPath() {
         return path;
-    }
-
-    //setters
-    public void setPath(String path) {
-        this.path = path;
     }
 
     @Override

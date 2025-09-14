@@ -2,11 +2,18 @@ package com.model.Fines;
 
 import com.model.Automobile.Automobile;
 
-public class ExcessiveSpeedFine extends Fine {
-    private int automobileSpeed;
-    private int speedLimit;
+import java.util.Set;
 
-    public ExcessiveSpeedFine(double amount, int scoring, EventGeolocation eventGeolocation, InfractionType infractionType, Automobile automobile, int automobileSpeed, int speedLimit) {
+public class ExcessiveSpeedFine extends Fine {
+    private final int automobileSpeed;
+    private final int speedLimit;
+
+    public ExcessiveSpeedFine(Integer FineID, EventGeolocation eventGeolocation, InfractionType infractionType, Automobile automobile, Set<Photo> photoSet, int speedLimit, int automobileSpeed) {
+        super(FineID, eventGeolocation, infractionType, automobile, photoSet);
+        this.automobileSpeed = automobileSpeed;
+        this.speedLimit = speedLimit;
+    }
+    public ExcessiveSpeedFine(EventGeolocation eventGeolocation, InfractionType infractionType, Automobile automobile, int speedLimit, int automobileSpeed) {
         super( eventGeolocation, infractionType, automobile);
         this.automobileSpeed = automobileSpeed;
         this.speedLimit = speedLimit;

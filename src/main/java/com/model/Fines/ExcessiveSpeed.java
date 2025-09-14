@@ -1,32 +1,33 @@
 package com.model.Fines;
 
-public class ExcessiveSpeed extends InfractionType {
-    private final double surchargePer10PercentExcess;
+import java.math.BigDecimal;
 
-    public ExcessiveSpeed(String description, double amount, int scoring,double surchargePer10PercentExcess) {
+public class ExcessiveSpeed extends InfractionType {
+    private final BigDecimal surchargePer10PercentExcess;
+
+    public ExcessiveSpeed(String description, BigDecimal amount, int scoring,BigDecimal surchargePer10PercentExcess) {
         super("Speeding",description, amount, scoring);
         this.surchargePer10PercentExcess = surchargePer10PercentExcess;
     }
 
-    public double getSurchargePer10PercentExcess() {
+    public BigDecimal getSurchargePer10PercentExcess() {
         return surchargePer10PercentExcess;
     }
 
 
     public void calculateImportScoring(double automobileSpeed, double speedLimit){
-        double imp = getAmount();
+        BigDecimal imp = getAmount();
         int score = getScoring();
         int Excess = (int)((automobileSpeed - speedLimit)/(speedLimit * 0.1));
 
         for(int i=0; i<Excess; i++){
-            imp += this.surchargePer10PercentExcess;
+            imp.add(surchargePer10PercentExcess);
             score += 1;
         }
 
         setAmount(imp);
         setScoring(score);
     }
-
 
     @Override
     public String toString() {

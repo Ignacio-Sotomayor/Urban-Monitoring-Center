@@ -1,7 +1,7 @@
 package com.model.Automobile;
 
 public class Model implements Comparable<Model> {
-    private String name;
+    private final String name;
 
     public Model(String name) {
         this.name = name;
@@ -9,11 +9,6 @@ public class Model implements Comparable<Model> {
 
     public String getName() {
         return name;
-    }
-
-    //setters
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

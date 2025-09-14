@@ -1,11 +1,11 @@
 package com.model.Automobile;
 
 public class Automobile implements Comparable<Automobile>{
-    private String licensePlate;
+    private final String licensePlate;
     private Owner owner;
-    private Brand brand;
-    private Model model;
-    private int year;
+    private final Brand brand;
+    private final Model model;
+    private final int year;
 
     public Automobile(String licensePlate, Brand brand, Model model, Owner owner, int year) {
         this.licensePlate = licensePlate;
@@ -32,6 +32,9 @@ public class Automobile implements Comparable<Automobile>{
         return model;
     }
 
+    //setter
+    public void setOwner(Owner owner) { this.owner = owner; }
+
     @Override
     public String toString() {
         return String.format("%s model %s %d of %s with the license plate: %s", brand.getName(),model.toString(),year,owner.getFullName(),licensePlate);
@@ -42,6 +45,6 @@ public class Automobile implements Comparable<Automobile>{
     }
 
     public int compareTo(Automobile other){
-        return this.licensePlate.compareTo(((Automobile)other).licensePlate);
+        return this.licensePlate.compareTo(other.licensePlate);
     }
 }

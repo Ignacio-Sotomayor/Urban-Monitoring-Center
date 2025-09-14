@@ -22,4 +22,9 @@ public abstract class FineIssuerDevice extends Device{
         Fine fine = new Fine( new EventGeolocation(LocalDateTime.now(),super.getAddress(), super.getLocation(), this), emitedInfractionType,a);
         MVR.addFineToAutomobile(a, fine);
     }
+    public void IssueFine(Automobile a){
+        MotorVehicleRegistry MVR = MotorVehicleRegistry.getMotorVehicleRegistry();
+        Fine fine = new Fine( new EventGeolocation(LocalDateTime.now(),super.getAddress(), super.getLocation(), this), emitedInfractionType,a);
+        MVR.addFineToAutomobile(a, fine);
+    }
 }

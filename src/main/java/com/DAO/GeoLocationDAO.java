@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class GeoLocationDAO {
 
-    public void insertGeoLocation(Timestamp timestamp, String address, BigDecimal latitude, BigDecimal longitude, String UUID)throws SQLException{
+    public static void insertGeoLocation(Timestamp timestamp, String address, BigDecimal latitude, BigDecimal longitude, String UUID)throws SQLException{
         String sql = "INSERT INTO GeoLocations (GeoLocation_DateTime, GeoLocation_Address, Latitude, Longitude, DeviceUUID) VALUES (?, ?, ?, ?, ?)";
 
         try(Connection con = DBConnection.getConnection();
@@ -24,20 +24,23 @@ public class GeoLocationDAO {
             pstmt.setBigDecimal(4, longitude);
             pstmt.setString(5, UUID);
 
+            pstmt.executeUpdate();
         }
     }
 
-    public EventGeolocation getGeoLocation(long GeoLocation_ID) throws SQLException{
-        StringBuilder sql = new StringBuilder("SELECT GeoLocation_DateTime, GeoLocation_Address, Latitude, Longitude, DeviceUUID FROM GeoLocations WHERE GeoLocation_ID = ?");
+    public static EventGeolocation getGeoLocation(long GeoLocation_ID) throws SQLException{
+        String sql = "SELECT GeoLocation_DateTime, GeoLocation_Address, Latitude, Longitude, DeviceUUID FROM GeoLocations WHERE GeoLocation_ID = ?";
+
         LocalDateTime dateTime;
         String address;
         UUID id;
         BigDecimal latitude, longitude;
-        sql.append(GeoLocation_ID);
-        try(Connection con = DBConnection.getConnection();
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(sql.toString())){
 
+        try(Connection con = DBConnection.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            ){
+            pstmt.setLong(1,GeoLocation_ID);
+            ResultSet rs = pstmt.executeQuery();
             dateTime = rs.getTimestamp("GeoLocation_DateTime").toLocalDateTime();
             address = rs.getString("GeoLocation_Address");
             latitude = rs.getBigDecimal("Latitude");
@@ -48,7 +51,7 @@ public class GeoLocationDAO {
         return new EventGeolocation(dateTime,address,new Location(latitude,longitude), UrbanMonitoringCenter.getSpecificDevice(id));
     }
 
-    public void deleteGeoLocation(long GeoLocation_ID) throws SQLException {
+    public static void deleteGeoLocation(long GeoLocation_ID) throws SQLException {
         String sql = "DELETE FROM GeoLocations WHERE GeoLocation_ID = ?";
 
         try (Connection conn = DBConnection.getConnection();

@@ -1,10 +1,11 @@
 package com.model.Automobile;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class Brand implements Comparable<Brand> {
-    private String name;
-    private Set<Model> models;
+    private final String name;
+    private final Set<Model> models;
 
     public Brand(String name) {
         this.name = name;
@@ -19,8 +20,8 @@ public class Brand implements Comparable<Brand> {
     public String getName() {
         return name;
     }
-    public Set<Model> getModels() {
-        return models;
+    public Iterator getModels() {
+        return models.iterator();
     }
 
     @Override

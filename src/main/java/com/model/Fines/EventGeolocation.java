@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class EventGeolocation {
-    private LocalDateTime dateTime;
-    private String address;
-    private Device device;
-    private Location location;
+    private final LocalDateTime dateTime;
+    private final String address;
+    private final Device device;
+    private final Location location;
 
 
     public EventGeolocation(LocalDateTime dateTime, String address, Location location, Device device) {
@@ -22,19 +22,12 @@ public class EventGeolocation {
 
     //getters
     public LocalDateTime getDateTime() {
-  return dateTime;
- }
-    public void setDateTime(LocalDateTime dateTime) {
-  this.dateTime = dateTime;
+  return this.dateTime;
  }
     public String getAddress() {
-  return address;
+  return this.address;
  }
-
-    //setters
-    public void setAddress(String address) {
-  this.address = address;
- }
+    public Device getDevice(){  return this.device; }
 
     @Override
     public String toString() {
