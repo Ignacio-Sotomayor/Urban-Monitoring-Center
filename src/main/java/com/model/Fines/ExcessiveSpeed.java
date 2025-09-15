@@ -29,6 +29,7 @@ public class ExcessiveSpeed extends InfractionType {
         setScoring(score);
     }
 
+
     @Override
     public String toString() {
         return super.toString() + ", ExcessiveSpeed [surchargePer10PercentExcess=" + surchargePer10PercentExcess + "]";

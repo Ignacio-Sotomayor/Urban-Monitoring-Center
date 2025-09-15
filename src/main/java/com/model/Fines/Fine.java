@@ -48,6 +48,11 @@ public class Fine {
     public Integer getFine_Id() {
         return fine_Id;
     }
+    public void setEventGeolocation(EventGeolocation eventGeolocation) {
+        this.eventGeolocation = eventGeolocation;
+    }
+    public void setInfractionType(InfractionType infractionType) {this.infractionType = infractionType;}
+    public void setAutomobile(Automobile automobile){ this.automobile = automobile;}
 
     public void addPhoto(Photo photo) {
         photos.add(photo);

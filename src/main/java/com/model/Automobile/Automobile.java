@@ -1,11 +1,11 @@
 package com.model.Automobile;
 
 public class Automobile implements Comparable<Automobile>{
-    private final String licensePlate;
+    private String licensePlate;
     private Owner owner;
-    private final Brand brand;
-    private final Model model;
-    private final int year;
+    private Brand brand;
+    private Model model;
+    private int year;
 
     public Automobile(String licensePlate, Brand brand, Model model, Owner owner, int year) {
         this.licensePlate = licensePlate;
