@@ -5,7 +5,6 @@ import com.model.UrbanMonitoringCenter;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
@@ -14,20 +13,22 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HelloController {
+public class MapController {
 
     @FXML
     private WebView webView;
-    @FXML
-    private Label labelCursor;
 
     private WebEngine webEngine;
     private List<Device> devices;
     private Timer simulationTimer;
 
+    public MapController(WebView webView) {
+        this.webView = webView;
+    }
+
     public class JavaConnector {
         public void updateCursorPosition(String coordinates) {
-            Platform.runLater(() -> labelCursor.setText(coordinates));
+            System.out.println("Cursor position: " + coordinates); // Log to console instead
         }
     }
 
