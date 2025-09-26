@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+# Proyecto
+=======
 # 🏙️ Urban Monitoring Center – Java Simulation Project
 
 This repository contains the implementation of a **City Monitoring Center Simulator**, designed to oversee and coordinate networks of urban traffic and security devices. The project applies object-oriented programming principles using Java, and integrates key software engineering concepts such as visual interfaces, multithreading, event handling, persistence, and data processing.
@@ -51,3 +54,4 @@ This project is extensible and designed for integration with:
 - Expanded device types and violation categories
 
 ---
+>>>>>>> e7221fb2e1cbcea021b8fa259f4391b08509e530

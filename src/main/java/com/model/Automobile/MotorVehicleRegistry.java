@@ -1,17 +1,22 @@
 package com.model.Automobile;
+import com.DAO.AutomobileDAO;
+import com.DAO.FineDAO;
+import com.DAO.InfractionTypesDAO;
 import com.model.Fines.*;
 
 import java.util.*;
 
 public class MotorVehicleRegistry {
-    private static String name = "Mar del Plata Car Dealership";
-    private Set<Brand> brands;
-    private Map<Automobile,List<Fine>> automobilesInformation;
+    private static final String name = "Mar del Plata Car Dealership";
+    private final Set<Brand> brands;
+    private final Map<Automobile,List<Fine>> automobilesInformation;
     private static MotorVehicleRegistry instance = null;
+    private final Set<Fine> recentFines;
 
     private MotorVehicleRegistry(){
         this.brands = new TreeSet<>();
         this.automobilesInformation = new TreeMap<Automobile,List<Fine>>();
+        recentFines = HashSet.newHashSet(10);
     }
 
     public static MotorVehicleRegistry getMotorVehicleRegistry(){
@@ -71,6 +76,11 @@ public class MotorVehicleRegistry {
     public void addBrand(Brand brand) { brands.add(brand); }
     public void addAutomobile(Automobile a) { automobilesInformation.put(a,new ArrayList<>()); }
     public void addFineToAutomobile(Automobile a, Fine f) { automobilesInformation.get(a).add(f); }
+    public void addFineToDB(Fine f){
+        FineDAO.insertFine(f.getAmount(),f.getScoring(), InfractionTypesDAO.getInfractionTypeIdByName(f.getInfractionType().getName()), AutomobileDAO.getAutomobileIdByLicensePlate(f.getAutomobile().getLicensePlate()), GeoLocationDAO.getGeoLocation());
+
+    }
+
 
     public void showAllAutomobiles() {
         for (Automobile a : automobilesInformation.keySet()) {

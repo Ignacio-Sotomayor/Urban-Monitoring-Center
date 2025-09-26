@@ -1,16 +1,28 @@
 package com.model.Fines;
+
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import com.model.Automobile.Automobile;
 
 public class Fine {
-    private double amount;
-    private int scoring;
-    private Set<Photo> photos; 
-    private EventGeolocation eventGeolocation;
-    private InfractionType infractionType;
-    private Automobile automobile;
+    private Integer fine_Id;
+    private final BigDecimal amount;
+    private final int scoring;
+    private final Set<Photo> photos;
+    private final EventGeolocation eventGeolocation;
+    private final InfractionType infractionType;
+    private final Automobile automobile;
 
+    public Fine(Integer fine_Id, EventGeolocation eventGeolocation, InfractionType infractionType,Automobile automobile,Set<Photo> photos) {
+        this.fine_Id = fine_Id;
+        this.infractionType = infractionType;
+        this.amount = infractionType.getAmount();
+        this.scoring = infractionType.getScoring();
+        this.photos = photos;
+        this.eventGeolocation = eventGeolocation;
+        this.automobile=automobile;
+    }
     public Fine( EventGeolocation eventGeolocation, InfractionType infractionType,Automobile automobile) {
         this.infractionType = infractionType;
         this.amount = infractionType.getAmount();
@@ -22,7 +34,7 @@ public class Fine {
 
     //getters
     public Set<Photo> getPhotos() { return photos;}
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
     public int getScoring() {
@@ -33,19 +45,9 @@ public class Fine {
         return infractionType;
     }
     public Automobile getAutomobile(){ return automobile;}
-
-    //setters
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public Integer getFine_Id() {
+        return fine_Id;
     }
-    public void setScoring(int scoring) {
-        this.scoring = scoring;
-    }
-    public void setEventGeolocation(EventGeolocation eventGeolocation) {
-        this.eventGeolocation = eventGeolocation;
-    }
-    public void setInfractionType(InfractionType infractionType) {this.infractionType = infractionType;}
-    public void setAutomobile(Automobile automobile){ this.automobile = automobile;}
 
     public void addPhoto(Photo photo) {
         photos.add(photo);
