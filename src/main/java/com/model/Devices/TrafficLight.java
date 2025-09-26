@@ -1,7 +1,9 @@
 package com.model.Devices;
 import com.model.Devices.TrafficLightState;
 
-public class TrafficLight {
+import java.io.Serializable;
+
+public class TrafficLight implements Serializable {
     private String street;
     private String orientation;
     private boolean isMain;

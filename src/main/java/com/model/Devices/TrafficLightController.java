@@ -22,8 +22,8 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
     // mainLight -> index=0
     // secondaryLight -> index=1
 
-    public TrafficLightController( String address, Location location, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
-        super(address, location, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+    public TrafficLightController( String address, Location location,boolean state, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
+        super(address, location, state,UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
         this.redLightDuration = redLightDuration;
         this.yellowLightDuration = yellowLightDuration;
         this.greenLightDuration = greenLightDuration;
@@ -32,8 +32,8 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         intersectionLights.add(1, secondaryLight);
     }
 
-    public TrafficLightController(String address, Location location, TrafficLight mainLight, TrafficLight secondaryLight){
-        super(address, location, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+    public TrafficLightController(String address, Location location,boolean state, TrafficLight mainLight, TrafficLight secondaryLight){
+        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
         redLightDuration = Duration.ofSeconds(30);
         yellowLightDuration = Duration.ofSeconds(4);
         greenLightDuration = Duration.ofSeconds(40);
@@ -42,8 +42,8 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         intersectionLights.add(1, secondaryLight);
     }
 
-    public TrafficLightController(String address, Location location, LocalDateTime intermittentStartTime, LocalDateTime intermittentEndTime, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
-        super(address, location, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+    public TrafficLightController(String address, Location location, boolean state, LocalDateTime intermittentStartTime, LocalDateTime intermittentEndTime, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
+        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
         this.intermittentStartTime = intermittentStartTime;
         this.intermittentEndTime = intermittentEndTime;
         this.redLightDuration = redLightDuration;

@@ -7,7 +7,7 @@ public class Owner {
 
     public Owner(String fullName, String legalIid, String address) {
         this.fullName = fullName;
-        this.legalId = legalIid;
+        this.legalIid = legalIid;
         this.address = address;
     }
 

@@ -16,6 +16,10 @@ public class Main {
         UrbanMonitoringCenter.Initialize();
         MotorVehicleRegistry MVR = MotorVehicleRegistry.getMotorVehicleRegistry();
         UrbanMonitoringCenter UMC = UrbanMonitoringCenter.getUrbanMonitoringCenter();
+        // UMC.serializeAllDevices("devices.ser");
+        // UMC.deserializeAllDevices("devices.ser");
+         UMC.showDevices();
+
 
         FineIssuerDevice fineIssuer;
         for (int i = 0; i < 10; i++) {

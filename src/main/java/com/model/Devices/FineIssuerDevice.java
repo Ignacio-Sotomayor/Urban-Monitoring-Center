@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public abstract class FineIssuerDevice extends Device{
     private InfractionType emitedInfractionType;
 
-    public FineIssuerDevice(String address, Location location, InfractionType emitedInfractionType) {
-        super(address, location);
+    public FineIssuerDevice(String address, Location location,boolean state, InfractionType emitedInfractionType) {
+        super(address, location, state);
         this.emitedInfractionType = emitedInfractionType;
     }
 
