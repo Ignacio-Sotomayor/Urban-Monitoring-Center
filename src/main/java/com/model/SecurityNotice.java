@@ -19,6 +19,12 @@ public class SecurityNotice implements Comparable<SecurityNotice>{
         calledServices = new HashSet();
     }
 
+    public SecurityNotice(String description, EventGeolocation eventGeolocation, Set<Service> calledServices){
+        this.description = description;
+        this.eventGeolocation= eventGeolocation;
+        this.calledServices = calledServices;
+    }
+
     public void addCalledService(Service service){
         calledServices.add(service);
     }

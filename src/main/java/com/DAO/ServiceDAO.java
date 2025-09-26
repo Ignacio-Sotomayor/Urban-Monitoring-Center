@@ -7,16 +7,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ServiceDAO {
-    public static void insertService(String serviceName, String ServicePhoneNumber, Integer SecurityNoticeID) throws SQLException{
-        String sql = "INSERT INTO Services (Service_name, Service_PhoneNumber,SecurityNotice_ID) VALUES (?,?,?)";
+    public static Integer insertService(String serviceName, String ServicePhoneNumber) throws SQLException{
+        String sql = "INSERT INTO Services (Service_name, Service_PhoneNumber) VALUES (?,?)";
 
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setString(1,serviceName);
             pstmt.setString(2,ServicePhoneNumber);
-            pstmt.setInt(3,SecurityNoticeID);
+
             pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            return rs.getInt(1);
         }
     }
     public static void deleteService(Integer ID)throws SQLException{
@@ -29,23 +31,28 @@ public class ServiceDAO {
             pstmt.executeUpdate();
         }
     }
-    public static Set<Service> getServiceOnSecurityNotice(Integer SecurityNoticeID)throws SQLException{
-        String sql = "SELECT Service_name,ServicePhoneNumber FROM Services WHERE SecurityNotice_ID = ?";
-        HashSet<Service> services = new HashSet<>();
+    public static Integer getServiceIdByPhone(String name, String phoneNumber) throws SQLException{
+        String sql = "SELECT Service_ID FROM Services WHERE Service_PhoneNumber = ?";
+
         try(Connection conn = DBConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql)
         ){
-            pstmt.setInt(1,SecurityNoticeID);
+            pstmt.setString(1, name);
+            pstmt.setString(2,phoneNumber);
+
             ResultSet rs = pstmt.executeQuery();
-            while(rs.next()){
-                switch (rs.getString("Service_name")){
-                    case "Police": services.add(Service.Police); break;
-                    case "FireFighters": services.add(Service.FireFighters); break;
-                    case "Ambulance": services.add(Service.Ambulance); break;
-                    case "CivilDefense":services.add(Service.CivilDefense); break;
-                }
-            }
+            return  rs.getInt("Service_ID");
         }
-        return services;
+    }
+    public static Service getServiceByID(Integer serviceID)throws SQLException{
+        String sql = "Select * FROM Services WHERE Service_ID = ?";
+
+        try( Connection conn = DBConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ){
+            pstmt.setString(1, serviceID.toString());
+            ResultSet rs = pstmt.executeQuery();
+            return Service.getService(rs.getString("Service_PhoneNumber"));
+        }
     }
 }

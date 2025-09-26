@@ -1,7 +1,6 @@
 package com.model.Automobile;
 import com.DAO.AutomobileDAO;
 import com.DAO.FineDAO;
-import com.DAO.GeoLocationDAO;
 import com.DAO.InfractionTypesDAO;
 import com.model.Fines.*;
 
