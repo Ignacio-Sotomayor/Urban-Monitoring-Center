@@ -23,6 +23,7 @@ public class MainWindow extends JFrame {
         JButton mapButton = new JButton("Map");
         JButton camerasButton = new JButton("Cameras");
         JButton finesButton = new JButton("Fines");
+        JButton securityButton = new JButton("Security Notices");
 
         mapButton.addActionListener(e -> {
             if (mapWindow == null) {
@@ -32,19 +33,25 @@ public class MainWindow extends JFrame {
             mapWindow.toFront();
         });
 
-
         camerasButton.addActionListener(e -> {
             CamerasWindow camerasWindow = new CamerasWindow();
             camerasWindow.setVisible(true);
         });
+
         finesButton.addActionListener(e -> {
             FinesWindow finesWindow = new FinesWindow();
             finesWindow.setVisible(true);
         });
 
+        securityButton.addActionListener(e -> {
+            SecurityNoticeWindow securityNoticeWindow = new SecurityNoticeWindow();
+            securityNoticeWindow.setVisible(true);
+        });
+
         add(mapButton);
         add(camerasButton);
         add(finesButton);
+        add(securityButton);
     }
 
     public static void main(String[] args) {
