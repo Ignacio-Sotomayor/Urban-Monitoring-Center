@@ -2,11 +2,14 @@ package com.model.Devices;
 
 import com.model.UrbanMonitoringCenter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Device implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -4572253917025209395L;
     private UUID id;
     private String address;
     private boolean state;

@@ -3,7 +3,11 @@ package com.model.Devices;
 import com.model.Automobile.Automobile;
 import com.model.UrbanMonitoringCenter;
 
+import java.io.Serial;
+
 public class Radar extends FineIssuerDevice {
+    @Serial
+    private static final long serialVersionUID = -515232461427930552L;
     private double speedLimit;
 
     public Radar( String address, Location location,boolean state, double speedLimit) {

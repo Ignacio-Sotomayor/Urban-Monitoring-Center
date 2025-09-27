@@ -1,9 +1,12 @@
 package com.model.Devices;
 import com.model.Devices.TrafficLightState;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class TrafficLight implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -179790607119410917L;
     private String street;
     private String orientation;
     private boolean isMain;

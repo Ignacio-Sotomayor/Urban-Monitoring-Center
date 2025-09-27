@@ -6,10 +6,13 @@ import com.model.Fines.EventGeolocation;
 import com.model.Fines.Fine;
 import com.model.Fines.InfractionType;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 
 
 public abstract class FineIssuerDevice extends Device{
+    @Serial
+    private static final long serialVersionUID = 7716519194965191290L;
     private InfractionType emitedInfractionType;
 
     public FineIssuerDevice(String address, Location location,boolean state, InfractionType emitedInfractionType) {

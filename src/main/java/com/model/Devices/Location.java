@@ -1,10 +1,13 @@
 package com.model.Devices;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import java.math.BigDecimal;
 
 public class Location implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -2663931308894801511L;
     private BigDecimal latitude, longitude;
 
     public Location(BigDecimal latitude, BigDecimal longitude) {
