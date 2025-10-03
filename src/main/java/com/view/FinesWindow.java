@@ -1,6 +1,9 @@
 package com.view;
 
+import com.model.Automobile.Automobile;
+import com.model.Automobile.MotorVehicleRegistry;
 import com.model.Fines.Fine;
+import com.model.UrbanMonitoringCenter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -8,6 +11,11 @@ import java.awt.*;
 
 public class FinesWindow extends JFrame {
     private final JPanel filterPanel;
+    private static RegistryNotifier notifier = new RegistryNotifier();
+
+    public static RegistryNotifier getNotifier() {
+        return notifier;
+    }
 
     public FinesWindow() {
         super("Fines");
@@ -24,7 +32,8 @@ public class FinesWindow extends JFrame {
         // Center sector
         String[] columnNames = {"Automobile", "Infraction", "Amount", "Scoring", "Location"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        JTable table = new JTable(tableModel);
+        IssuedTable table = new IssuedTable(columnNames);
+        notifier.addObserver(table);
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
     }
@@ -40,13 +49,11 @@ public class FinesWindow extends JFrame {
             filterPanel.add(btn);
         }
     }
-
     private void loadFines(){
-        // No se. Database ahre
     }
 
     private void applyFilter(String filterType) {
-        // No se. Database ahre
-        System.out.println("Applying " + filterType);
+        Automobile a = MotorVehicleRegistry.getMotorVehicleRegistry().getRandomAutomobile();
+        UrbanMonitoringCenter.getUrbanMonitoringCenter().getRandomFineIssuerDevice().issueFine(a);
     }
 }

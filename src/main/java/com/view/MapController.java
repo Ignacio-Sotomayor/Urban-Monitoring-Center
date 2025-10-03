@@ -94,7 +94,7 @@ public class MapController {
                 Device deviceToChange = devices.get(random.nextInt(devices.size()));
 
                 UrbanMonitoringCenter umc = UrbanMonitoringCenter.getUrbanMonitoringCenter();
-                boolean isWorking = umc.getWorkingDevices().contains(deviceToChange);
+                boolean isWorking = deviceToChange.getState();
 
                 String newStatus = isWorking ? "NO OPERATIVO" : "OPERATIVO";
                 if (isWorking) {

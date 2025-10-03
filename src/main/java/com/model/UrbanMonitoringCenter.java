@@ -25,6 +25,10 @@ public class UrbanMonitoringCenter {
         infractionTypes = new HashMap<>();
     }
 
+    public Device getSpecificDevice(UUID uuid) {
+        return devices.get(uuid);
+    }
+
     public void addSecurityNotice(SecurityNotice notice){ securityNotices.add(notice); }
 
     //getters
@@ -99,5 +103,11 @@ public class UrbanMonitoringCenter {
         for (Map.Entry<UUID, Device> d : devices.entrySet()) {
             System.out.println(d);
         }
+    }
+
+    public Set<Device> getWorkingDevices(){
+        return devices.values().stream()
+                .filter(Device::getState)
+                .collect(Collectors.toSet());
     }
 }
