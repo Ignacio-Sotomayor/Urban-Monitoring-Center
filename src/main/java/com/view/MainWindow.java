@@ -26,9 +26,8 @@ public class MainWindow extends JFrame {
         JButton securityButton = new JButton("Security Notices");
 
         mapButton.addActionListener(e -> {
-            if (mapWindow == null) {
+            if (mapWindow == null)
                 mapWindow = new MapWindow();
-            }
             mapWindow.setVisible(true);
             mapWindow.toFront();
         });
