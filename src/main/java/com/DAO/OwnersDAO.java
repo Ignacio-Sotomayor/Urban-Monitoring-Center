@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class OwnersDAO {
-    public static void insertOwner(String legalID, String fullName, String Address) throws SQLException {
+    public Integer insertOwner(String legalID, String fullName, String Address) throws SQLException {
         String sql = "INSERT INTO Owners (Owner_LegalID, Owner_FullName, Owner_Address) VALUES (?, ?, ?)";
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
@@ -18,9 +18,12 @@ public class OwnersDAO {
             pstmt.setString(2,fullName);
             pstmt.setString(3,Address);
             pstmt.executeUpdate();
+
+            ResultSet rs = pstmt.getGeneratedKeys();
+            return rs.getInt(1);
         }
     }
-    public static void deleteOwner(String legalID)throws SQLException{
+    public void deleteOwner(String legalID)throws SQLException{
         String sql = "DELETE FROM Owners WHERE Owner_LegalID=?";
 
         try(Connection conn = DBConnection.getConnection();
@@ -30,7 +33,7 @@ public class OwnersDAO {
             pstmt.executeUpdate();
         }
     }
-    public static Integer getOwnerIdByLegalID(String legalID)throws SQLException{
+    public Integer getOwnerIdByLegalID(String legalID)throws SQLException{
         String sql = "SELECT Owner_ID FORM OWNERS WHERE Owner_LegalID = ?";
         Integer response;
         try(Connection conn = DBConnection.getConnection();
@@ -42,7 +45,7 @@ public class OwnersDAO {
         }
         return response;
     }
-    public static Owner getOwnerByOwnerId(Integer OwnerID) throws SQLException{
+    public Owner getOwnerByOwnerId(Integer OwnerID) throws SQLException{
         String sql = "SELECT Owner_LegalID, Owner_FullName, Owner_Address FROM OWNERS WHERE Owner_ID = ?";
         String legalID,address,fullname;
         try(Connection conn = DBConnection.getConnection();

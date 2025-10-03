@@ -7,16 +7,19 @@ import java.util.Map;
 
 
 public class BrandsDAO {
-    public static void insertBrand(String BrandName)throws SQLException {
-        String sql = "INSERT INTO Brands (Brand_Name) VALUES (?)";
+    public Integer insertBrand(String BrandName)throws SQLException {
+        String sql = "INSERT INTO Brands (Brand_Name) VALUES (?) ";
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ){
             pstmt.setString(1,BrandName);
             pstmt.executeUpdate();
+
+            ResultSet rs = pstmt.getGeneratedKeys();
+            return rs.getInt(1);
         }
     }
-    public static int getBrand_IdByName(String Name)throws SQLException{
+    public int getBrand_IdByName(String Name)throws SQLException{
         String sql = "Select Brand_ID from Brands WHERE Brand_Name = ?";
         int Brand_ID;
         try(Connection conn = DBConnection.getConnection();
@@ -28,7 +31,7 @@ public class BrandsDAO {
         }
         return Brand_ID;
     }
-    public static Brand getBrandByBrandID(Integer BrandID)throws SQLException{
+    public Brand getBrandByBrandID(Integer BrandID)throws SQLException{
         String sql = "SELECT Brand_Name FROM Brands WHERE Brand_ID = ?";
         String brandName;
         try(Connection conn = DBConnection.getConnection();
@@ -40,7 +43,7 @@ public class BrandsDAO {
         }
         return new Brand(brandName);
     }
-    public static Map<Integer,Brand> getAllBrands()throws SQLException{
+    public Map<Integer,Brand> getAllBrands()throws SQLException{
         Map<Integer,Brand> response= new HashMap<>();
         String sql = "Select * From Brands";
 
@@ -54,7 +57,7 @@ public class BrandsDAO {
         return response;
     }
 
-    public static void deleteBrand(String BrandName)throws SQLException{
+    public void deleteBrand(String BrandName)throws SQLException{
         String sql = "DELETE FROM Brands WHERE Brand_Name = ?";
         try(Connection conn = DBConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(sql)){

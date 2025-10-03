@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class InfractionTypesDAO {
-    public static InfractionType getInfractionTypeByID(Integer InfractionTypeID) throws SQLException {
+    public InfractionType getInfractionTypeByID(Integer InfractionTypeID) throws SQLException {
         String sql = "SELECT InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount, surchangePer10PercentExcess FROM InfractionTypes WHERE InfractionType_ID = ?";
         String InfractionTypeName, InfractionTypeDesc;
         int InfractionTypeScoring;
@@ -33,7 +33,7 @@ public class InfractionTypesDAO {
         else
             return new InfractionType(InfractionTypeName,InfractionTypeDesc,InfractionTypeAmount,InfractionTypeScoring);
     }
-    public static Integer getInfractionTypeIdByName(String name) throws SQLException{
+    public Integer getInfractionTypeIdByName(String name) throws SQLException{
         String sql = "SELECT InfractionType_ID FROM InfractionTypes WHERE InfractionType_Name = ?";
         Integer id;
 
@@ -46,7 +46,7 @@ public class InfractionTypesDAO {
         }
         return id;
     }
-    public static void insertInfractionType(String Name, String Description, int scoring, int amount, BigDecimal surcharge ) throws SQLException{
+    public void insertInfractionType(String Name, String Description, int scoring, int amount, BigDecimal surcharge ) throws SQLException{
         String sql = "INSERT INTO InfractionTypes (InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount, surchangePer10PercentExcess) VALUES (?, ?, ?, ? ,?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -61,7 +61,7 @@ public class InfractionTypesDAO {
             pstmt.executeUpdate();
         }
     }
-    public static void insertInfractionType(String Name, String Description, int scoring, int amount) throws SQLException{
+    public void insertInfractionType(String Name, String Description, int scoring, int amount) throws SQLException{
         String sql = "INSERT INTO InfractionTypes (InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount) VALUES (?, ?, ?, ?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -75,7 +75,7 @@ public class InfractionTypesDAO {
             pstmt.executeUpdate();
         }
     }
-    public static void deleteInfractionType(Integer InfractionTypeID) throws SQLException {
+    public void deleteInfractionType(Integer InfractionTypeID) throws SQLException {
         String sql = "DELETE FROM InfractionTypes WHERE InfractionType_ID = ?";
 
         try(Connection conn = DBConnection.getConnection();

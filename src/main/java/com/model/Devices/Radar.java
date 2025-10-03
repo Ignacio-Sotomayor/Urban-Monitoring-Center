@@ -1,9 +1,14 @@
 package com.model.Devices;
 
+import com.DAO.AutomobileDAO;
+import com.DAO.FineDAO;
 import com.model.Automobile.Automobile;
 import com.model.UrbanMonitoringCenter;
 
 import java.io.Serial;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 public class Radar extends FineIssuerDevice {
     @Serial
@@ -20,7 +25,19 @@ public class Radar extends FineIssuerDevice {
     }
     public void issueFine(Automobile a, double speed) {
         if (speed > speedLimit) {
-            super.issueFine(a);
+            try{
+            AutomobileDAO automobileDao = new AutomobileDAO();
+            Integer automobileId = automobileDao.getAutomobileIdByLicensePlate(a.getLicensePlate());
+            automobileDao =null;
+
+            FineDAO fineDao = new FineDAO();
+            fineDao.insertSpeedingFine(super.getEmitedInfractionType().getAmount(),super.getEmitedInfractionType().getScoring(),
+                    super.getLocation().getLatitude(),super.getLocation().getLongitude(),super.getAddress(), Timestamp.from(Instant.now()),
+                    super.getId().toString(),automobileId,Integer.parseInt(String.valueOf(this.speedLimit)),Integer.parseInt(String.valueOf(speed)));
+            fineDao = null;
+        }catch(SQLException e){
+                throw new RuntimeException(e);
+            }
         }
     }
 }

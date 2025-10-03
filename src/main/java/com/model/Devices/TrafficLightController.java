@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class TrafficLightController extends FineIssuerDevice implements Runnable{
     @Serial
     private static final long serialVersionUID = -2100951556457963217L;
+
     private @Nullable LocalDateTime intermittentStartTime;
     private @Nullable LocalDateTime intermittentEndTime;
 

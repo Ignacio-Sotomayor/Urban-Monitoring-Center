@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ServiceDAO {
-    public static Integer insertService(String serviceName, String ServicePhoneNumber) throws SQLException{
+    public Integer insertService(String serviceName, String ServicePhoneNumber) throws SQLException{
         String sql = "INSERT INTO Services (Service_name, Service_PhoneNumber) VALUES (?,?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -21,7 +21,7 @@ public class ServiceDAO {
             return rs.getInt(1);
         }
     }
-    public static void deleteService(Integer ID)throws SQLException{
+    public void deleteService(Integer ID)throws SQLException{
         String sql = "DELETE FORM Services WHERE Service_ID = ?";
 
         try(Connection conn = DBConnection.getConnection();
@@ -31,7 +31,7 @@ public class ServiceDAO {
             pstmt.executeUpdate();
         }
     }
-    public static Integer getServiceIdByPhone(String name, String phoneNumber) throws SQLException{
+    public Integer getServiceIdByPhone(String name, String phoneNumber) throws SQLException{
         String sql = "SELECT Service_ID FROM Services WHERE Service_PhoneNumber = ?";
 
         try(Connection conn = DBConnection.getConnection();
@@ -44,7 +44,7 @@ public class ServiceDAO {
             return  rs.getInt("Service_ID");
         }
     }
-    public static Service getServiceByID(Integer serviceID)throws SQLException{
+    public Service getServiceByID(Integer serviceID)throws SQLException{
         String sql = "Select * FROM Services WHERE Service_ID = ?";
 
         try( Connection conn = DBConnection.getConnection();

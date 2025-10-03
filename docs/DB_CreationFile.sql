@@ -27,7 +27,7 @@ CREATE TABLE InfractionTypes(
     InfractionType_Description VARCHAR(100) NOT NULL UNIQUE,
     InfractionType_Scoring INTEGER CHECK (InfractionType_Scoring > 0),
     InfractionType_Amount DECIMAL(10,2) CHECK (InfractionType_Amount > 0),
-    surchangePer10PercentExcess DECIMAL(10,2)
+    surchargePer10PercentExcess DECIMAL(10,2)
 );
 CREATE TABLE Fines(
     Fine_ID Serial PRIMARY KEY,
@@ -49,7 +49,7 @@ CREATE TABLE Photos(
     Fine_ID INTEGER REFERENCES Fines(Fine_ID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE SecuityNotices(
+CREATE TABLE SecurityNotices(
     SecurityNotice_ID Serial PRIMARY KEY,
     SecurityNotice_Description VARCHAR(100) NOT NULL,
     SecurityNotice_Latitude DECIMAL(9,6) CHECK (Latitude >= -90 AND Latitude <= 90) NOT NULL,
@@ -62,12 +62,12 @@ CREATE TABLE SecuityNotices(
 CREATE TABLE Services(
     Service_ID Serial PRIMARY KEY,
     Service_Name VARCHAR(25) NOT NULL,
-    Sevice_PhoneNumber VARCHAR(25) NOT NULL,
+    Service_PhoneNumber VARCHAR(25) NOT NULL,
 );
 CREATE TABLE SecurityNoticeDetails(
     SecurityNoticeDetail_ID Serial PRIMARY KEY,
     Service_ID INTEGER REFERENCES Services(Service_ID) ON DELETE CASCADE ON UPDATE CASCADE,
-    SecurityNotice_ID INTEGER REFERENCES SecuityNotices(SecurityNotice_ID) ON DELETE CASCADE ON UPDATE CASCADE
+    SecurityNotice_ID INTEGER REFERENCES SecurityNotices(SecurityNotice_ID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 INSERT INTO Brands (Brand_Name) VALUES ('Toyota');

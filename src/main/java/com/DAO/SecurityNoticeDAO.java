@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class SecurityNoticeDAO {
 
-    public static Integer insertSecurityNotice(String description, Timestamp timestamp, String address, BigDecimal latitude, BigDecimal longitude, String UUID, Set<Service> calledServices) throws SQLException{
+    public Integer insertSecurityNotice(String description, Timestamp timestamp, String address, BigDecimal latitude, BigDecimal longitude, String UUID, Set<Service> calledServices) throws SQLException{
         String sql = "INSERT INTO SecurityNotices (SecurityNotice_Description, SecurityNotice_Latitude, SecurityNotice_Longitude, SecurityNotice_Address, SecurityNotice_DateTime, Issuer_DeviceUUID) VALUES (?, ?, ?, ?, ?, ?)";
         Integer SecurityNoticeID;
         try(Connection conn = DBConnection.getConnection();
@@ -30,13 +30,15 @@ public class SecurityNoticeDAO {
             ResultSet rs = pstmt.getGeneratedKeys();
             SecurityNoticeID = rs.getInt(1);
         }
+        ServiceDAO serviceDao = new ServiceDAO();
+        SecurityNoticeDetailsDAO detailsDao = new SecurityNoticeDetailsDAO();
         for(Service s: calledServices){
-            Integer serviceID = ServiceDAO.getServiceIdByPhone(s.getName(),s.getPhoneNumber());
-            SecurityNoticeDetailsDAO.insertSecurityNoticeDetail(SecurityNoticeID, serviceID);
+            Integer serviceID = serviceDao.getServiceIdByPhone(s.getName(),s.getPhoneNumber());
+            detailsDao.insertSecurityNoticeDetail(SecurityNoticeID, serviceID);
         }
         return SecurityNoticeID;
     }
-    public static void deleteSecurityNotice(Integer SecurityNoticeID) throws SQLException{
+    public void deleteSecurityNotice(Integer SecurityNoticeID) throws SQLException{
         String sql = "DELETE FROM SecurityNotices WHERE SecurityNotice_ID = ?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -46,7 +48,7 @@ public class SecurityNoticeDAO {
             pstmt.executeUpdate();
         }
     }
-    public static SecurityNotice getSecurityNotice(Integer ID) throws SQLException{
+    public SecurityNotice getSecurityNotice(Integer ID) throws SQLException{
         String sql = "SELECT SecurityNotice_Description, GeoLocation_ID FROM SecurityNotices WHERE SecurityNotice_ID = ?";
         String description;
         Timestamp timestamp;
@@ -66,6 +68,8 @@ public class SecurityNoticeDAO {
             timestamp = rs.getTimestamp("SecurityNotice_DateTime");
             uuid = rs.getString("Issuer_DeviceUUID");
         }
-        return new SecurityNotice(description, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getSpecificDevice(java.util.UUID.fromString(uuid))), SecurityNoticeDetailsDAO.getAllServicesForSecurityNotice(ID));
+        SecurityNoticeDetailsDAO detailsDao = new SecurityNoticeDetailsDAO();
+
+        return new SecurityNotice(description, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(java.util.UUID.fromString(uuid))), detailsDao.getAllServicesForSecurityNotice(ID));
     }
 }

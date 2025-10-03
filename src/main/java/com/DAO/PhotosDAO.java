@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PhotosDAO {
-    public static Photo getPhotoByID(Integer PhotoID)throws SQLException{
+    public Photo getPhotoByID(Integer PhotoID)throws SQLException{
         String sql = "SELECT Photo_Path FROM Photos WHERE Photo_ID = ?";
         String path;
 
@@ -23,7 +23,7 @@ public class PhotosDAO {
         }
         return  new Photo(path);
     }
-    public static Set<Photo> getAllPhotosFromFine(Integer FineID) throws SQLException{
+    public Set<Photo> getAllPhotosFromFine(Integer FineID) throws SQLException{
         String sql = "SELECT Photo_Path From Photos WHERE Fine_ID = ?";
         Set<Photo> photos = new HashSet<>();
         try(Connection conn = DBConnection.getConnection();
@@ -37,7 +37,7 @@ public class PhotosDAO {
         }
         return photos;
     }
-    public static void InsertPhoto(String PhotoPath, Integer FineID)throws SQLException{
+    public Integer InsertPhoto(String PhotoPath, Integer FineID)throws SQLException{
         String sql = "INSERT INTO Photos (Photo_Path, FineID) VALUES (?,?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -46,9 +46,11 @@ public class PhotosDAO {
             pstmt.setString(1,PhotoPath);
             pstmt.setInt(2,FineID);
             pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            return rs.getInt(1);
         }
     }
-    public static void deletePhoto(Integer PhotoID) throws SQLException {
+    public void deletePhoto(Integer PhotoID) throws SQLException {
         String sql = "DELETE FROM Photos WHERE Photo_ID = ? ";
 
         try (Connection conn = DBConnection.getConnection();

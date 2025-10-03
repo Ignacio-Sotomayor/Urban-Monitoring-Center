@@ -22,11 +22,17 @@ public class EventGeolocation {
 
     //getters
     public LocalDateTime getDateTime() {
-  return this.dateTime;
- }
+        return this.dateTime;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
     public String getAddress() {
-  return this.address;
- }
+        return address;
+    }
+
     public Device getDevice(){  return this.device; }
 
     @Override

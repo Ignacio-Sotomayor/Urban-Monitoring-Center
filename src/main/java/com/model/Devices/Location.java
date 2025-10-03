@@ -15,6 +15,14 @@ public class Location implements Serializable {
         this.longitude = longitude;
     }
 
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
     public String toString(){
         StringBuilder builder = new StringBuilder();
         builder.append(latitude);

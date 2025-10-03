@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AutomobileDAO {
-    public static Integer getAutomobileIdByLicensePlate(String licensePLate) throws SQLException {
+    public Integer getAutomobileIdByLicensePlate(String licensePLate) throws SQLException {
         String sql = "SELECT Automobile_ID FROM Automobiles WHERE license_Plate = ?";
         Integer AutomobileID;
         try(Connection conn = DBConnection.getConnection();
@@ -23,7 +23,7 @@ public class AutomobileDAO {
         }
         return AutomobileID;
     }
-    public static Automobile getAutomobileByAutomobileID(Integer AutomobileID) throws SQLException{
+    public Automobile getAutomobileByAutomobileID(Integer AutomobileID) throws SQLException{
         String sql =" SELECT license_Plate, Automobile_Year, Model_ID, Owner_ID FROM Automobiles WHERE Automobile_ID = ?";
         Integer ModelID,OwnerID;
         String licensePlate;
@@ -41,12 +41,16 @@ public class AutomobileDAO {
             ModelID = rs.getInt("Model_ID");
             OwnerID = rs.getInt("Owner_ID");
         }
-        owner = OwnersDAO.getOwnerByOwnerId(OwnerID);
-        model = ModelsDAO.getModelByModelId(ModelID);
-        brand = ModelsDAO.getBrandOfModel(ModelID);
+        OwnersDAO ownerDao= new OwnersDAO();
+        ModelsDAO modelDao = new ModelsDAO();
+
+        owner = ownerDao.getOwnerByOwnerId(OwnerID);
+        model = modelDao.getModelByModelId(ModelID);
+        brand = modelDao.getBrandOfModel(ModelID);
+
         return new Automobile(licensePlate,brand,model,owner,Year);
     }
-    public static void insertAutomobile(String licensePlate, int AutomobileYear, Integer ModelID, Integer OwnerID) throws SQLException{
+    public void insertAutomobile(String licensePlate, int AutomobileYear, Integer ModelID, Integer OwnerID) throws SQLException{
         String sql = "INSERT INTO Automobiles (license_Plate, Automobile_Year, Model_ID, Owner_ID) VALUES (?,?,?,?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -60,7 +64,7 @@ public class AutomobileDAO {
             pstmt.executeUpdate();
         }
     }
-    public static void deleteAutomobileByAutomobileID(Integer automobileID) throws SQLException{
+    public void deleteAutomobileByAutomobileID(Integer automobileID) throws SQLException{
         String sql = "DELETE FROM Automobiles WHERE Automobile_ID = ?";
 
         try(Connection conn = DBConnection.getConnection();
