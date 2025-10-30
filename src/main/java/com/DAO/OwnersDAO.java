@@ -11,6 +11,7 @@ import java.sql.SQLException;
 public class OwnersDAO {
     public Integer insertOwner(String legalID, String fullName, String Address) throws SQLException {
         String sql = "INSERT INTO Owners (Owner_LegalID, Owner_FullName, Owner_Address) VALUES (?, ?, ?)";
+        int id=0;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ){
@@ -20,8 +21,11 @@ public class OwnersDAO {
             pstmt.executeUpdate();
 
             ResultSet rs = pstmt.getGeneratedKeys();
-            return rs.getInt(1);
+            if (rs.next())
+                id=rs.getInt(1);
+
         }
+        return id;
     }
     public void deleteOwner(String legalID)throws SQLException{
         String sql = "DELETE FROM Owners WHERE Owner_LegalID=?";
@@ -47,16 +51,17 @@ public class OwnersDAO {
     }
     public Owner getOwnerByOwnerId(Integer OwnerID) throws SQLException{
         String sql = "SELECT Owner_LegalID, Owner_FullName, Owner_Address FROM OWNERS WHERE Owner_ID = ?";
-        String legalID,address,fullname;
+        String legalID = "",address = "",fullname = "";
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ){
             pstmt.setInt(1,OwnerID);
             ResultSet rs = pstmt.executeQuery();
-            legalID = rs.getString("Owner_LegalID");
-            fullname = rs.getString("Owner_FullName");
-            address = rs.getString("Owner_Address");
-
+            if(rs.next()) {
+                legalID = rs.getString("Owner_LegalID");
+                fullname = rs.getString("Owner_FullName");
+                address = rs.getString("Owner_Address");
+            }
         }
         return new Owner(legalID,fullname,address);
     }

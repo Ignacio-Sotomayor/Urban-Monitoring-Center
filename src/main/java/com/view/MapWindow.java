@@ -30,7 +30,7 @@ public class MapWindow extends JFrame {
 
             // Pass a fresh copy of the devices list
             controller.setDeviceData(
-                    new ArrayList<>(UrbanMonitoringCenter.getUrbanMonitoringCenter().getWorkingDevices())
+                    new ArrayList<>(UrbanMonitoringCenter.getUrbanMonitoringCenter().getDevices().values())
             );
 
             controller.initialize();

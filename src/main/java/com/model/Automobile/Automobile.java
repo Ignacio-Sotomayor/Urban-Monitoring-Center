@@ -37,7 +37,7 @@ public class Automobile implements Comparable<Automobile>{
 
     @Override
     public String toString() {
-        return String.format("%s model %s %d of %s with the license plate: %s", brand.getName(),model.toString(),year,owner.getFullName(),licensePlate);
+        return String.format("%s model %s %d of %s with the license plate: %s", brand.getName(),model.toString(),getYear(),owner.getFullName(),getLicensePlate());
     }
 
     public boolean equals(Automobile other){

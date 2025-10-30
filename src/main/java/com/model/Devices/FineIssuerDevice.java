@@ -21,7 +21,7 @@ public abstract class FineIssuerDevice extends Device{
     @Serial
     private static final long serialVersionUID = 7716519194965191290L;
     private InfractionType emitedInfractionType;
-    private final RegistryNotifier notifier;
+    private transient final RegistryNotifier notifier;
 
     public FineIssuerDevice(String address, Location location,boolean state, InfractionType emitedInfractionType) {
         super(address, location, state);
@@ -37,7 +37,6 @@ public abstract class FineIssuerDevice extends Device{
     public void issueFine(Automobile a){
         MotorVehicleRegistry MVR = MotorVehicleRegistry.getMotorVehicleRegistry();
         Fine fine = new Fine( new EventGeolocation(LocalDateTime.now(),super.getAddress(), super.getLocation(), this), emitedInfractionType,a);
-        MVR.addFineToAutomobile(a, fine);
         try{
             InfractionTypesDAO infractionDao = new InfractionTypesDAO();
             Integer infractionTypeID = infractionDao.getInfractionTypeIdByName(fine.getInfractionType().getName());

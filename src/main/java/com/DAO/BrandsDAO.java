@@ -33,12 +33,13 @@ public class BrandsDAO {
     }
     public Brand getBrandByBrandID(Integer BrandID)throws SQLException{
         String sql = "SELECT Brand_Name FROM Brands WHERE Brand_ID = ?";
-        String brandName;
+        String brandName="";
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setInt(1, BrandID);
             ResultSet rs = pstmt.executeQuery();
+            if(rs.next())
             brandName = rs.getString("Brand_Name");
         }
         return new Brand(brandName);

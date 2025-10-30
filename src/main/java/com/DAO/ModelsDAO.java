@@ -11,12 +11,13 @@ import java.sql.SQLException;
 public class ModelsDAO {
     public Model getModelByModelId(Integer ModelID)throws SQLException {
         String sql = "SELECT Model_Name FROM Models WHERE Models_ID =?";
-        String modelName;
+        String modelName="";
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setInt(1,ModelID);
             ResultSet rs = pstmt.executeQuery();
+            if(rs.next())
             modelName = rs.getString("Model_Name");
         }
         return new Model(modelName);
@@ -35,14 +36,16 @@ public class ModelsDAO {
     }
     public Brand getBrandOfModel(Integer ModelID) throws SQLException{
         String sql = "SELECT Brand_ID FROM Models WHERE Models_ID =?";
-        Integer BrandID;
+        Integer BrandID=0 ;
         String BrandName;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setInt(1,ModelID);
             ResultSet rs = pstmt.executeQuery();
-            BrandID = rs.getInt("Brand_ID");
+
+            if(rs.next())
+                BrandID = rs.getInt("Brand_ID");
         }
         BrandsDAO brandDao = new BrandsDAO();
         return brandDao.getBrandByBrandID(BrandID);

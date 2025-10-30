@@ -293,7 +293,37 @@ public class FineDAO {
         }
         return fines;
     }
+    public Set<Fine> getAllFinesFromAutomobile(int automobileID)throws SQLException{
+        String sql = "SELECT * FROM fines WHERE automobile_id = ? ";
+        Set<Fine> fines = new HashSet();
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+        ){
+            pstmt.setInt(1,automobileID);
+            ResultSet rs = pstmt.executeQuery();
+            InfractionTypesDAO infractionDao = new InfractionTypesDAO();
+            AutomobileDAO automobileDao = new AutomobileDAO();
+            PhotosDAO photoDao = new PhotosDAO();
 
+            while (rs.next()) {
+                int FineID = rs.getInt("Fine_ID");
+                Timestamp timestamp = rs.getTimestamp("Fine_DateTime");
+                String address = rs.getString("Fine_Address");
+                BigDecimal latitude = rs.getBigDecimal("Fine_Latitude");
+                BigDecimal longitude = rs.getBigDecimal("Fine_Longitude");
+                String uuid= rs.getString("Issuer_DeviceUUID");
+                int InfractionTypeID = rs.getInt("InfractionType_ID");
+
+                if(InfractionTypeID!=1) {
+                    fines.add(new Fine(FineID, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(InfractionTypeID), automobileDao.getAutomobileByAutomobileID(automobileID), photoDao.getAllPhotosFromFine(FineID)));
+
+                } else
+                    fines.add(new ExcessiveSpeedFine(FineID, new EventGeolocation(timestamp.toLocalDateTime(), address, new Location(latitude, longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(1), automobileDao.getAutomobileByAutomobileID(automobileID), photoDao.getAllPhotosFromFine(FineID), rs.getInt("SpeedLimit"), rs.getInt("AutomobileSpeed")));
+            }
+        }
+        return fines;
+
+    }
     public Iterator<Fine> getNRecentFines(int N) throws SQLException {
         String sql = "SELECT * FROM Fines Limit ?";
 

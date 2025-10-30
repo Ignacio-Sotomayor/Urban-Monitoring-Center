@@ -8,12 +8,10 @@ import java.util.*;
 
 public class MotorVehicleRegistry {
     private static final String name = "Mar del Plata Car Dealership";
-    private final Set<Brand> brands;
     private final Map<Automobile,List<Fine>> automobilesInformation;
     private static MotorVehicleRegistry instance = null;
 
     private MotorVehicleRegistry(){
-        this.brands = new TreeSet<>();
         this.automobilesInformation = new TreeMap<Automobile,List<Fine>>();
     }
 
@@ -37,7 +35,6 @@ public class MotorVehicleRegistry {
         }
 
     }
-
     public void addBrand(Brand brand) {
         BrandsDAO brandDao = new BrandsDAO();
         ModelsDAO modelDao = new ModelsDAO();
@@ -64,15 +61,26 @@ public class MotorVehicleRegistry {
             throw new RuntimeException(e);
         }
     }
-    public void addFineToAutomobile(Automobile a, Fine f) { automobilesInformation.get(a).add(f); }
-
 
     public void showAllAutomobiles() {
         for (Automobile a : automobilesInformation.keySet()) {
-            System.out.println(a);
+            System.out.println(a.toString());
         }
     }
-
+    public void loadAutomobilesFromDB(){
+        AutomobileDAO automobileDAO = new AutomobileDAO();
+        FineDAO fineDao = new FineDAO();
+        int id;
+        try {
+            Set<Automobile> automobiles = automobileDAO.getAllAutomobiles();
+            for (Automobile a : automobiles) {
+                id = automobileDAO.getAutomobileIdByLicensePlate(a.getLicensePlate());
+                automobilesInformation.put(a,fineDao.getAllFinesFromAutomobile(id).stream().toList() );
+            }
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+    }
     public int getScoring(Automobile a) {
         int scoring = 20;
         List<Fine> fines = automobilesInformation.get(a);

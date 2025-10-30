@@ -117,7 +117,7 @@ INSERT INTO Automobiles (license_Plate, Automobile_Year, Model_ID, Owner_ID) VAL
 INSERT INTO Automobiles (license_Plate, Automobile_Year, Model_ID, Owner_ID) VALUES ('AB012CD', 2023, 14, 2);
 INSERT INTO Automobiles (license_Plate, Automobile_Year, Model_ID, Owner_ID) VALUES ('EF456GI', 2020, 15, 3);
 
-INSERT INTO InfractionTypes (InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount, surchangePer10PercentExcess) VALUES 
+INSERT INTO InfractionTypes (InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount, surchargePer10PercentExcess) VALUES
 ('Speeding', 'The automobile was captured driving over the speed limit', 2, 217800, 20);
 INSERT INTO InfractionTypes (InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount) VALUES 
 ('RedLightViolation', 'The automobile was captured running a red light', 5, 141600);
