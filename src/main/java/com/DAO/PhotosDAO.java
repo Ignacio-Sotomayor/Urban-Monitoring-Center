@@ -12,13 +12,14 @@ import java.util.Set;
 public class PhotosDAO {
     public Photo getPhotoByID(Integer PhotoID)throws SQLException{
         String sql = "SELECT Photo_Path FROM Photos WHERE Photo_ID = ?";
-        String path;
+        String path="";
 
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setInt(1,PhotoID);
             ResultSet rs = pstmt.executeQuery();
+            if(rs.next())
             path = rs.getString(1);
         }
         return  new Photo(path);
@@ -37,7 +38,7 @@ public class PhotosDAO {
         }
         return photos;
     }
-    public Integer InsertPhoto(String PhotoPath, Integer FineID)throws SQLException{
+    public int InsertPhoto(String PhotoPath, Integer FineID)throws SQLException{
         String sql = "INSERT INTO Photos (Photo_Path, FineID) VALUES (?,?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -47,7 +48,7 @@ public class PhotosDAO {
             pstmt.setInt(2,FineID);
             pstmt.executeUpdate();
             ResultSet rs = pstmt.getGeneratedKeys();
-            return rs.getInt(1);
+            return (rs.next())?rs.getInt(1):0;
         }
     }
     public void deletePhoto(Integer PhotoID) throws SQLException {

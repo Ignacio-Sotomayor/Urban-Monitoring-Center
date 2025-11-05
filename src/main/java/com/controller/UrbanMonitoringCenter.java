@@ -1,18 +1,14 @@
-package com.model;
-import com.DAO.InfractionTypesDAO;
+package com.controller;
 import com.DAO.OwnersDAO;
-import com.DAO.SecurityNoticeDAO;
-import com.model.Automobile.MotorVehicleRegistry;
 import com.model.Devices.*;
-import com.model.Fines.ExcessiveSpeed;
 import com.model.Fines.InfractionType;
+import com.model.SecurityNotice;
+import com.model.UnrepairableDeviceException;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.io.*;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,12 +60,12 @@ public class UrbanMonitoringCenter {
     }
     public void issuedDevices(Device d){
         if(! devices.isEmpty() && devices.containsValue(d)) {
-            d.setState(false);
+            d.breakDevice();
         }
     }
-    public void repairDevices(Device d){
+    public void repairDevices(Device d) throws UnrepairableDeviceException {
         if(! devices.isEmpty() && devices.containsValue(d)){
-            d.setState(true);
+            d.repair();
         }
     }
 
@@ -82,7 +78,7 @@ public class UrbanMonitoringCenter {
         }
     } */
 
-    public static void loadDevices(){
+    public static void baseBrandStart(){
         UrbanMonitoringCenter UMC = getUrbanMonitoringCenter();
         TrafficLightController tf;
 
@@ -145,16 +141,15 @@ public class UrbanMonitoringCenter {
         plCamera = new ParkingLotSecurityCamera("Av. Colon 2900", new Location(BigDecimal.valueOf(-38.002099),BigDecimal.valueOf(-57.553031)),true, Duration.ofSeconds(1200));
         UMC.devices.put(plCamera.getId(),plCamera);
 
-        UMC.serializeAllDevices("devices.ser");
+        UMC.saveDevices("devices.ser");
     }
 
-    public static void Initialize(){
+    public static void lastStateStart(){
         UrbanMonitoringCenter UMC = getUrbanMonitoringCenter();
-        //loadDevices();
-        UMC.deserializeAllDevices("devices.ser");
+        UMC.loadDevices("devices.ser");
     }
 
-    public void serializeAllDevices(String fileName){
+    public void saveDevices(String fileName){
         try(ObjectOutputStream oop = new ObjectOutputStream(new FileOutputStream(fileName))) {
             oop.writeObject(devices);
         } catch (IOException e) {
@@ -162,7 +157,7 @@ public class UrbanMonitoringCenter {
         }
     }
 
-    public void deserializeAllDevices (String fileName) {
+    public void loadDevices (String fileName) {
         try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))){
             HashMap<UUID,Device> loadedDevices = (HashMap<UUID, Device>) ois.readObject();
             this.devices = loadedDevices;
@@ -177,11 +172,11 @@ public class UrbanMonitoringCenter {
         }
     }
 
-    public int insertOwner() {
+    public int insertOwner(String legalID,String fullName, String address) {
         OwnersDAO ownersDAO = new OwnersDAO();
         int id = 0;
         try {
-            return ownersDAO.insertOwner("23457892","John Smith","234 Sequoia St");
+            return ownersDAO.insertOwner(legalID,fullName,address);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

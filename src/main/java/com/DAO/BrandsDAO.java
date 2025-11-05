@@ -7,7 +7,7 @@ import java.util.Map;
 
 
 public class BrandsDAO {
-    public Integer insertBrand(String BrandName)throws SQLException {
+    public int insertBrand(String BrandName)throws SQLException {
         String sql = "INSERT INTO Brands (Brand_Name) VALUES (?) ";
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
@@ -16,17 +16,21 @@ public class BrandsDAO {
             pstmt.executeUpdate();
 
             ResultSet rs = pstmt.getGeneratedKeys();
-            return rs.getInt(1);
+            if(rs.next())
+                return rs.getInt(1);
+            else
+                return 0;
         }
     }
     public int getBrand_IdByName(String Name)throws SQLException{
         String sql = "Select Brand_ID from Brands WHERE Brand_Name = ?";
-        int Brand_ID;
+        int Brand_ID=0;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ){
             pstmt.setString(1, Name);
             ResultSet rs = pstmt.executeQuery();
+            if(rs.next())
             Brand_ID = rs.getInt("Brand_ID");
         }
         return Brand_ID;

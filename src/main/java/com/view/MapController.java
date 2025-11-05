@@ -1,7 +1,7 @@
 package com.view;
 
 import com.model.Devices.*;
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
@@ -67,7 +67,7 @@ public class MapController {
             String allDevicesJson = devices.stream()
                 .map(d -> {
                     // 20% de probabilidad de que un dispositivo empiece como NO OPERATIVO
-                    boolean isOperative = random.nextDouble() > 0.2;
+                    boolean isOperative = random.nextDouble() > 0.02;
                     String status = isOperative ? "OPERATIVO" : "NO OPERATIVO";
                     if (!isOperative) {
                         umc.issuedDevices(d);
@@ -99,8 +99,6 @@ public class MapController {
                 String newStatus = isWorking ? "NO OPERATIVO" : "OPERATIVO";
                 if (isWorking) {
                     umc.issuedDevices(deviceToChange);
-                } else {
-                    umc.repairDevices(deviceToChange);
                 }
 
                 String popupText = getPopupTextForDevice(deviceToChange);
@@ -127,5 +125,6 @@ public class MapController {
         if (simulationTimer != null) {
             simulationTimer.cancel();
         }
+        UrbanMonitoringCenter.getUrbanMonitoringCenter().saveDevices("devices.ser");
     }
 }

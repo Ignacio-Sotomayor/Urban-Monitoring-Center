@@ -9,7 +9,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.web.WebView;
 
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 
 public class MapWindow extends JFrame {
 
@@ -36,6 +36,7 @@ public class MapWindow extends JFrame {
             controller.initialize();
 
             fxPanel.setScene(new Scene(webView, 800, 600));
+
         });
     }
 
@@ -45,6 +46,7 @@ public class MapWindow extends JFrame {
         if (controller != null) {
             controller.shutdown();
         }
+        UrbanMonitoringCenter.getUrbanMonitoringCenter().saveDevices("devices.ser");
         super.dispose();
     }
 }

@@ -2,8 +2,7 @@ package com.view;
 
 import com.model.Automobile.Automobile;
 import com.model.Automobile.MotorVehicleRegistry;
-import com.model.Fines.Fine;
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

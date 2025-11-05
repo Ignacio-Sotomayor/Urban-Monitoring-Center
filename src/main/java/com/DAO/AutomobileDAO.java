@@ -29,8 +29,8 @@ public class AutomobileDAO {
 
     public Automobile getAutomobileByAutomobileID(Integer AutomobileID) throws SQLException{
         String sql =" SELECT license_Plate, Automobile_Year, Model_ID, Owner_ID FROM Automobiles WHERE Automobile_ID = ?";
-        int ModelID,OwnerID, Year;
-        String licensePlate;
+        int ModelID=0,OwnerID=0, Year=0;
+        String licensePlate="";
         Owner owner;
         Model model;
         Brand brand;
@@ -39,10 +39,12 @@ public class AutomobileDAO {
         ){
             pstmt.setInt(1,AutomobileID);
             ResultSet rs = pstmt.executeQuery();
-            licensePlate = rs.getString("license_Plate");
-            Year = rs.getInt("Automobile_Year");
-            ModelID = rs.getInt("Model_ID");
-            OwnerID = rs.getInt("Owner_ID");
+            if(rs.next()){
+                licensePlate = rs.getString("license_Plate");
+                Year = rs.getInt("Automobile_Year");
+                ModelID = rs.getInt("Model_ID");
+                OwnerID = rs.getInt("Owner_ID");
+            }
         }
         OwnersDAO ownerDao= new OwnersDAO();
         ModelsDAO modelDao = new ModelsDAO();
@@ -53,9 +55,9 @@ public class AutomobileDAO {
 
         return new Automobile(licensePlate,brand,model,owner,Year);
     }
-    public void insertAutomobile(String licensePlate, int AutomobileYear, Integer ModelID, Integer OwnerID) throws SQLException{
+    public int insertAutomobile(String licensePlate, int AutomobileYear, Integer ModelID, Integer OwnerID) throws SQLException{
         String sql = "INSERT INTO Automobiles (license_Plate, Automobile_Year, Model_ID, Owner_ID) VALUES (?,?,?,?)";
-
+        int id=0;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
@@ -65,7 +67,11 @@ public class AutomobileDAO {
             pstmt.setInt(4,OwnerID);
 
             pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next())
+                id=rs.getInt(1);
         }
+        return id;
     }
     public void deleteAutomobileByAutomobileID(Integer automobileID) throws SQLException{
         String sql = "DELETE FROM Automobiles WHERE Automobile_ID = ?";

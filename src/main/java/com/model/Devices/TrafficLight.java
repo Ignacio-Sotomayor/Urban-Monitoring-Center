@@ -1,8 +1,11 @@
 package com.model.Devices;
 import com.model.Devices.TrafficLightState;
+import com.model.UnrepairableDeviceException;
+import com.model.DisconnectedTrafficLightException;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Random;
 
 public class TrafficLight implements Serializable {
     @Serial
@@ -24,6 +27,14 @@ public class TrafficLight implements Serializable {
     public String getOrientation() { return orientation; }
     public TrafficLightState getCurrentState(){ return currentState; }
 
-    public void changeState(TrafficLightState newState){ this.currentState = newState; }
+    public void changeState(TrafficLightState newState) throws DisconnectedTrafficLightException{
+        Random random = new Random();
+        this.currentState = (random.nextDouble()>0.005 )?newState:TrafficLightState.UNKNOWN;
+        if(currentState == TrafficLightState.UNKNOWN)
+            throw new DisconnectedTrafficLightException("");
+    }
 
+    public void setState(TrafficLightState trafficLightState) {
+        this.currentState= trafficLightState;
+    }
 }

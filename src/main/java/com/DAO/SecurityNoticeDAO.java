@@ -4,19 +4,18 @@ import com.model.Devices.Location;
 import com.model.Fines.EventGeolocation;
 import com.model.SecurityNotice;
 import com.model.Service;
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class SecurityNoticeDAO {
 
-    public Integer insertSecurityNotice(String description, Timestamp timestamp, String address, BigDecimal latitude, BigDecimal longitude, String UUID, Set<Service> calledServices) throws SQLException{
+    public int insertSecurityNotice(String description, Timestamp timestamp, String address, BigDecimal latitude, BigDecimal longitude, String UUID, Set<Service> calledServices) throws SQLException{
         String sql = "INSERT INTO SecurityNotices (SecurityNotice_Description, SecurityNotice_Latitude, SecurityNotice_Longitude, SecurityNotice_Address, SecurityNotice_DateTime, Issuer_DeviceUUID) VALUES (?, ?, ?, ?, ?, ?)";
-        Integer SecurityNoticeID;
+        int SecurityNoticeID;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
@@ -29,7 +28,10 @@ public class SecurityNoticeDAO {
 
             pstmt.executeUpdate();
             ResultSet rs = pstmt.getGeneratedKeys();
-            SecurityNoticeID = rs.getInt(1);
+            if(rs.next())
+                SecurityNoticeID = rs.getInt(1);
+            else
+                throw new SQLException();
         }
         ServiceDAO serviceDao = new ServiceDAO();
         SecurityNoticeDetailsDAO detailsDao = new SecurityNoticeDetailsDAO();
@@ -51,23 +53,25 @@ public class SecurityNoticeDAO {
     }
     public SecurityNotice getSecurityNotice(Integer ID) throws SQLException{
         String sql = "SELECT SecurityNotice_Description, SecurityNotice_Latitude,SecurityNotice_Longitude,SecurityNotice_Address, SecurityNotice_DateTime,Issuer_DeviceUUID FROM SecurityNotices WHERE SecurityNotice_ID = ?";
-        String description;
-        Timestamp timestamp;
-        String address;
-        BigDecimal latitude;
-        BigDecimal longitude;
-        String uuid;
+        String description="";
+        Timestamp timestamp= new Timestamp(1);
+        String address="";
+        BigDecimal latitude=new BigDecimal(1);
+        BigDecimal longitude=new BigDecimal(1);
+        String uuid="";
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setInt(1, ID);
             ResultSet rs = pstmt.executeQuery();
-            description = rs.getString("SecurityNotice_Description");
-            latitude = rs.getBigDecimal("SecurityNotice_Latitude");
-            longitude = rs.getBigDecimal("SecurityNotice_Longitude");
-            address = rs.getString("SecurityNotice_Address");
-            timestamp = rs.getTimestamp("SecurityNotice_DateTime");
-            uuid = rs.getString("Issuer_DeviceUUID");
+            if(rs.next()) {
+                description = rs.getString("SecurityNotice_Description");
+                latitude = rs.getBigDecimal("SecurityNotice_Latitude");
+                longitude = rs.getBigDecimal("SecurityNotice_Longitude");
+                address = rs.getString("SecurityNotice_Address");
+                timestamp = rs.getTimestamp("SecurityNotice_DateTime");
+                uuid = rs.getString("Issuer_DeviceUUID");
+            }
         }
         SecurityNoticeDetailsDAO detailsDao = new SecurityNoticeDetailsDAO();
 

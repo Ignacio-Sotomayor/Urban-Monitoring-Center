@@ -12,21 +12,23 @@ import java.sql.SQLException;
 public class InfractionTypesDAO {
     public InfractionType getInfractionTypeByID(Integer InfractionTypeID) throws SQLException {
         String sql = "SELECT InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount, surchangePer10PercentExcess FROM InfractionTypes WHERE InfractionType_ID = ?";
-        String InfractionTypeName, InfractionTypeDesc;
-        int InfractionTypeScoring;
-        BigDecimal InfractionTypeAmount;
-        BigDecimal surchangePer10PercentExcess;
+        String InfractionTypeName="", InfractionTypeDesc="";
+        int InfractionTypeScoring=0;
+        BigDecimal InfractionTypeAmount = new BigDecimal(0);
+        BigDecimal surchangePer10PercentExcess=new BigDecimal(0);
 
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setInt(1,InfractionTypeID);
             ResultSet rs = pstmt.executeQuery();
-            InfractionTypeName = rs.getString("InfractionType_Name");
-            InfractionTypeDesc = rs.getString("InfractionType_Description");
-            InfractionTypeScoring = rs.getInt("InfractionType_Scoring");
-            InfractionTypeAmount = rs.getBigDecimal("InfractionType_Amount");
-            surchangePer10PercentExcess = rs.getBigDecimal("surchangePer10PercentExcess");
+            if(rs.next()) {
+                InfractionTypeName = rs.getString("InfractionType_Name");
+                InfractionTypeDesc = rs.getString("InfractionType_Description");
+                InfractionTypeScoring = rs.getInt("InfractionType_Scoring");
+                InfractionTypeAmount = rs.getBigDecimal("InfractionType_Amount");
+                surchangePer10PercentExcess = rs.getBigDecimal("surchangePer10PercentExcess");
+            }
         }
         if(surchangePer10PercentExcess!=null)
             return new ExcessiveSpeed(InfractionTypeDesc,InfractionTypeAmount,InfractionTypeScoring,surchangePer10PercentExcess);
@@ -35,20 +37,21 @@ public class InfractionTypesDAO {
     }
     public Integer getInfractionTypeIdByName(String name) throws SQLException{
         String sql = "SELECT InfractionType_ID FROM InfractionTypes WHERE InfractionType_Name = ?";
-        Integer id;
+        Integer id=0;
 
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setString(1, name);
             ResultSet rs = pstmt.executeQuery();
+            if(rs.next())
             id = rs.getInt("InfractionType_ID");
         }
         return id;
     }
-    public void insertInfractionType(String Name, String Description, int scoring, int amount, BigDecimal surcharge ) throws SQLException{
+    public int insertInfractionType(String Name, String Description, int scoring, int amount, BigDecimal surcharge ) throws SQLException{
         String sql = "INSERT INTO InfractionTypes (InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount, surchangePer10PercentExcess) VALUES (?, ?, ?, ? ,?)";
-
+        int id =0;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
@@ -59,9 +62,11 @@ public class InfractionTypesDAO {
             pstmt.setBigDecimal(5,surcharge);
 
             pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            return (rs.next())?rs.getInt(1):0;
         }
     }
-    public void insertInfractionType(String Name, String Description, int scoring, int amount) throws SQLException{
+    public int insertInfractionType(String Name, String Description, int scoring, int amount) throws SQLException{
         String sql = "INSERT INTO InfractionTypes (InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount) VALUES (?, ?, ?, ?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -73,6 +78,8 @@ public class InfractionTypesDAO {
             pstmt.setInt(4,amount);
 
             pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            return (rs.next())?rs.getInt(1):0;
         }
     }
     public void deleteInfractionType(Integer InfractionTypeID) throws SQLException {

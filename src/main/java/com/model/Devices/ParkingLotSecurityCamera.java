@@ -1,6 +1,6 @@
 package com.model.Devices;
 
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 
 import java.io.Serial;
 import java.time.Duration;

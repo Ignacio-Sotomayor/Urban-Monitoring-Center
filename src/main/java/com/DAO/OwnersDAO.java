@@ -23,7 +23,6 @@ public class OwnersDAO {
             ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next())
                 id=rs.getInt(1);
-
         }
         return id;
     }
@@ -37,15 +36,16 @@ public class OwnersDAO {
             pstmt.executeUpdate();
         }
     }
-    public Integer getOwnerIdByLegalID(String legalID)throws SQLException{
+    public int getOwnerIdByLegalID(String legalID)throws SQLException{
         String sql = "SELECT Owner_ID FORM OWNERS WHERE Owner_LegalID = ?";
-        Integer response;
+        int response=0;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setString(1,legalID);
             ResultSet rs = pstmt.executeQuery();
-            response = Integer.valueOf(rs.getInt("Owner_ID"));
+            if(rs.next())
+                response = rs.getInt("Owner_ID");
         }
         return response;
     }

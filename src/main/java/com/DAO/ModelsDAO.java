@@ -18,18 +18,19 @@ public class ModelsDAO {
             pstmt.setInt(1,ModelID);
             ResultSet rs = pstmt.executeQuery();
             if(rs.next())
-            modelName = rs.getString("Model_Name");
+                modelName = rs.getString("Model_Name");
         }
         return new Model(modelName);
     }
-    public Integer getModelIdByName(String Name)throws SQLException{
+    public int getModelIdByName(String Name)throws SQLException{
         String sql = "SELECT Models_ID FROM Models WHERE Model_Name =?";
-        Integer modelId;
+        int modelId=0;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setString(1,Name);
             ResultSet rs = pstmt.executeQuery();
+            if(rs.next())
             modelId = rs.getInt("Models_ID");
         }
         return modelId;
@@ -50,7 +51,7 @@ public class ModelsDAO {
         BrandsDAO brandDao = new BrandsDAO();
         return brandDao.getBrandByBrandID(BrandID);
     }
-    public Integer insertModel(String ModelName, Integer BrandID)throws SQLException{
+    public int insertModel(String ModelName, Integer BrandID)throws SQLException{
         String sql = " INSERT INTO Models (Model_Name, Brand_ID) VALUES (?,?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -60,7 +61,10 @@ public class ModelsDAO {
             pstmt.setInt(2,BrandID);
             pstmt.executeUpdate();
             ResultSet rs = pstmt.getGeneratedKeys();
-            return rs.getInt(1);
+            if(rs.next())
+                return rs.getInt(1);
+            else
+                return 0;
         }
     }
     public void deleteModel(Integer ModelID)throws SQLException{

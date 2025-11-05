@@ -25,7 +25,7 @@ public class SecurityNoticeDetailsDAO {
         }
         return services;
     }
-    public Integer insertSecurityNoticeDetail(Integer SecurityNoticeID, Integer serviceID)throws SQLException{
+    public int insertSecurityNoticeDetail(Integer SecurityNoticeID, Integer serviceID)throws SQLException{
         String sql = "INSERT INTO SecurityNoticeDetails (Service_ID, SecurityNotice_ID) VALUES (?, ?)";
 
         try(Connection conn = DBConnection.getConnection();
@@ -37,7 +37,7 @@ public class SecurityNoticeDetailsDAO {
             pstmt.executeUpdate();
 
             ResultSet rs = pstmt.getGeneratedKeys();
-            return rs.getInt(1);
+            return (rs.next())?rs.getInt(1):0;
         }
     }
     public void deleteSecurityNoticeDetails(Integer SecurityNoticeID)throws SQLException{

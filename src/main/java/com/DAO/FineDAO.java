@@ -4,7 +4,7 @@ import com.model.Devices.Location;
 import com.model.Fines.EventGeolocation;
 import com.model.Fines.ExcessiveSpeedFine;
 import com.model.Fines.Fine;
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -58,7 +58,7 @@ public class FineDAO {
             pstmt.executeUpdate();
 
             ResultSet rs = pstmt.getGeneratedKeys();
-            return rs.getInt(1);
+            return (rs.next())?rs.getInt(1):0;
         }
     }
     public Set<Fine> getNFinesBetweenDates(Timestamp InitDate, Timestamp EndDate, int N, int Offset) throws SQLException {
@@ -270,7 +270,7 @@ public class FineDAO {
 
             rs = pstmt.executeQuery();
         }
-        if(rs != null){
+        if(rs.next()){
             InfractionTypesDAO infractionDao = new InfractionTypesDAO();
             AutomobileDAO automobileDao = new AutomobileDAO();
             PhotosDAO photoDao = new PhotosDAO();
@@ -343,7 +343,7 @@ public class FineDAO {
 
             rs = pstmt.executeQuery();
         }
-        if(rs != null){
+        if(rs.next()){
             InfractionTypesDAO infractionDao = new InfractionTypesDAO();
             AutomobileDAO automobileDao = new AutomobileDAO();
             PhotosDAO photoDao = new PhotosDAO();

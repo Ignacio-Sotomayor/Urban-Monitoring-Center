@@ -3,7 +3,7 @@ package com.model.Devices;
 import com.DAO.AutomobileDAO;
 import com.DAO.FineDAO;
 import com.model.Automobile.Automobile;
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 
 import java.io.Serial;
 import java.sql.SQLException;

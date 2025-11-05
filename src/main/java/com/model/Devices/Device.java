@@ -1,6 +1,6 @@
 package com.model.Devices;
 
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -35,12 +35,6 @@ public abstract class Device implements Serializable {
     public UUID getId() { return this.id; }
     public boolean getState(){ return state; }
 
-    public void fail(){
-        this.state = false;
-        System.out.format("The device %d stopped working \n",id);
-        UrbanMonitoringCenter.getUrbanMonitoringCenter().issuedDevices(this);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -53,8 +47,11 @@ public abstract class Device implements Serializable {
         return Objects.hashCode(id);
     }
 
-    public void setState(boolean state) {
-        this.state = state;
+    public void breakDevice() {
+        this.state = false;
+    }
+    public void repair(){
+        this.state = true;
     }
 
     public String stateToString(boolean state){

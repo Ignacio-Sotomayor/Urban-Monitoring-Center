@@ -3,14 +3,15 @@ package com.view;
 import javax.swing.*;
 import java.awt.*;
 
+import com.controller.UrbanMonitoringCenter;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 
-public class MainWindow extends JFrame {
+public class MenuWindow extends JFrame {
 
     private MapWindow mapWindow;
 
-    public MainWindow() {
+    public MenuWindow() {
         super("Urban Monitoring Center");
 
         setSize(400, 200);
@@ -51,17 +52,6 @@ public class MainWindow extends JFrame {
         add(camerasButton);
         add(finesButton);
         add(securityButton);
-    }
-
-    public static void main(String[] args) {
-        com.model.UrbanMonitoringCenter.Initialize();
-
-        new JFXPanel();
-        Platform.setImplicitExit(false);
-
-        SwingUtilities.invokeLater(() -> {
-            new MainWindow().setVisible(true);
-        });
     }
 
 }
