@@ -2,16 +2,30 @@ package com.model;
 import com.DAO.InfractionTypesDAO;
 import com.DAO.OwnersDAO;
 import com.DAO.SecurityNoticeDAO;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.Barcode128;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.model.Automobile.Automobile;
 import com.model.Automobile.MotorVehicleRegistry;
 import com.model.Devices.*;
 import com.model.Fines.ExcessiveSpeed;
+import com.model.Fines.Fine;
 import com.model.Fines.InfractionType;
+
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +36,12 @@ public class UrbanMonitoringCenter {
     private Map<String,InfractionType> infractionTypes;
 
     private static UrbanMonitoringCenter instance=null;
+
+    private Thread fineThread;
+    private volatile boolean running = false;
+
+    private static final int MIN_FINE_INTERVAL = 5;   // en segundos
+    private static final int MAX_FINE_INTERVAL = 15;  // en segundos
 
     private UrbanMonitoringCenter(){
         devices = new HashMap<>();
@@ -50,7 +70,7 @@ public class UrbanMonitoringCenter {
         return devices.get(random.nextInt(devices.size()));
     }
     public FineIssuerDevice getRandomFineIssuerDevice() {
-        List<FineIssuerDevice> fineIssuers = devices.entrySet().stream()
+        List<FineIssuerDevice> fineIssuers = devices.values().stream()
                 .filter(d -> d instanceof FineIssuerDevice)
                 .map(d -> (FineIssuerDevice) d)
                 .collect(Collectors.toList());
@@ -150,8 +170,9 @@ public class UrbanMonitoringCenter {
 
     public static void Initialize(){
         UrbanMonitoringCenter UMC = getUrbanMonitoringCenter();
-        //loadDevices();
-        UMC.deserializeAllDevices("devices.ser");
+        UMC.loadDevices();
+        // UMC.deserializeAllDevices("devices.ser");
+        UMC.loadInfractionTypes();
     }
 
     public void serializeAllDevices(String fileName){
@@ -171,20 +192,164 @@ public class UrbanMonitoringCenter {
         }
     }
 
+    public void loadInfractionTypes() {
+        InfractionTypesDAO dao = new InfractionTypesDAO();
+        try {
+            List<InfractionType> types = dao.getAllInfractionTypes();
+            for (InfractionType t : types) {
+                infractionTypes.put(t.getName(), t);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
     public void showDevices(){
         for (Map.Entry<UUID, Device> d : devices.entrySet()) {
             System.out.println(d);
         }
     }
 
-    public int insertOwner() {
-        OwnersDAO ownersDAO = new OwnersDAO();
-        int id = 0;
+    public int insertOwner(String legalId, String fullName, String address) {
         try {
-            return ownersDAO.insertOwner("23457892","John Smith","234 Sequoia St");
+            OwnersDAO ownersDAO = new OwnersDAO();
+            return ownersDAO.insertOwner(legalId, fullName, address);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
+
+    public synchronized void startRandomFineSimulation() {
+        stopRandomFineSimulation();
+
+        running = true;
+        fineThread = new Thread(() -> {
+            Random random = new Random();
+
+            while (running) {
+                try {
+                    simulateRandomFineOnce();
+                    int delay = random.nextInt(MAX_FINE_INTERVAL - MIN_FINE_INTERVAL + 1) + MIN_FINE_INTERVAL;
+                    Thread.sleep(delay * 1000);
+
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        });
+
+        fineThread.setDaemon(true);
+        fineThread.setName("RandomFineGenerator");
+        fineThread.start();
+    }
+
+    public synchronized void stopRandomFineSimulation() {
+        running = false;
+        if (fineThread != null) {
+            fineThread.interrupt();
+            fineThread = null;
+        }
+    }
+
+    public void simulateRandomFineOnce() {
+        MotorVehicleRegistry mvr = MotorVehicleRegistry.getMotorVehicleRegistry();
+
+        FineIssuerDevice device;
+        try {
+            device = getRandomFineIssuerDevice();
+            System.out.println(device.getEmitedInfractionType().getName());
+        } catch (IllegalStateException e) {
+            System.err.println("No hay dispositivos emisores disponibles.");
+            return;
+        }
+
+        Automobile auto = mvr.getRandomAutomobile();
+        if (auto == null) {
+            System.err.println("No hay autos disponibles.");
+            return;
+        }
+
+        if (!device.getState()) {
+            System.out.println("Dispositivo inoperativo, se salta: " + device.getId());
+            return;
+        }
+
+        try {
+            device.issueFine(auto);
+            System.out.println("Multa emitida por " + device.getAddress() + " a " + auto.getLicensePlate());
+        } catch (RuntimeException e) {
+            System.err.println("Error al emitir multa: " + e.getMessage());
+        }
+    }
+
+    private String generateBarcode(int fineNumber, BigDecimal amount) {
+        String finePart = String.format("%06d", fineNumber);
+
+        BigDecimal scaled = amount.setScale(2, BigDecimal.ROUND_HALF_UP);
+        String amountStr = scaled.toPlainString().replace(".", "");
+        amountStr = String.format("%012d", Long.parseLong(amountStr));
+
+        return finePart + amountStr;
+    }
+
+    
+    public void generateFinePDF(Fine fine, int fineNumber) {
+        Path outputDir = Paths.get("fines");
+        try {
+            if (!Files.exists(outputDir)) Files.createDirectories(outputDir);
+        } catch (IOException e) {
+            System.err.println("No se pudo crear carpeta fines: " + e.getMessage());
+            return;
+        }
+
+        String filename = String.format("Multa_%06d.pdf", fineNumber);
+        Path outputFile = outputDir.resolve(filename);
+
+        Document document = new Document();
+        try {
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outputFile.toFile()));
+            document.open();
+
+            Paragraph header = new Paragraph("Dirección de Tránsito\n");
+            header.setAlignment(Element.ALIGN_CENTER);
+            document.add(header);
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Número de multa: " + String.format("%06d", fineNumber)));
+            document.add(new Paragraph("Fecha de emisión: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
+            document.add(new Paragraph(" "));
+
+            document.add(new Paragraph("Titular: " + fine.getAutomobile().getOwner().getFullName()));
+            document.add(new Paragraph("DNI: " + fine.getAutomobile().getOwner().getLegalIid()));
+            document.add(new Paragraph("Domicilio: " + fine.getAutomobile().getOwner().getAddress()));
+            document.add(new Paragraph("Automóvil: " + fine.getAutomobile().getBrand() + " " + fine.getAutomobile().getModel()));
+            document.add(new Paragraph("Patente: " + fine.getAutomobile().getLicensePlate()));
+            document.add(new Paragraph(" "));
+
+            document.add(new Paragraph("Tipo de infracción: " + fine.getInfractionType().getDescription()));
+            document.add(new Paragraph("Lugar: " + fine.getEventGeolocation().getAddress()));
+            document.add(new Paragraph("Fecha/Hora: " + fine.getEventGeolocation().getDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
+            document.add(new Paragraph("Valor a pagar: $" + fine.getAmount()));
+            document.add(new Paragraph("Puntos a reducir: "));
+            document.add(new Paragraph(" "));
+
+            String barcodeValue = generateBarcode(fineNumber, fine.getAmount());
+            document.add(new Paragraph("Código de barras: " + barcodeValue));
+
+            Barcode128 barcode = new Barcode128();
+            barcode.setCode(barcodeValue);
+            Image barcodeImage = barcode.createImageWithBarcode(writer.getDirectContent(), null, null);
+            barcodeImage.scalePercent(150);
+            barcodeImage.setAlignment(Element.ALIGN_CENTER);
+            document.add(barcodeImage);
+
+            document.close();
+            writer.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -16,7 +16,7 @@ public class Radar extends FineIssuerDevice {
     private double speedLimit;
 
     public Radar( String address, Location location,boolean state, double speedLimit) {
-        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("ExcessiveSpeed"));
+        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("Speeding"));
         this.speedLimit = speedLimit;
     }
 

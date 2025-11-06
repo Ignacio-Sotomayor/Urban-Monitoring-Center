@@ -22,12 +22,23 @@ public class Main {
         MotorVehicleRegistry MVR = MotorVehicleRegistry.getMotorVehicleRegistry();
         UrbanMonitoringCenter UMC = UrbanMonitoringCenter.getUrbanMonitoringCenter();
 
-        //MVR.loadAutomobilesFromDB();
-        System.out.println(UMC.insertOwner());
+        MVR.loadAutomobilesFromDB();
+        UMC.loadInfractionTypes();
+        //System.out.println(UMC.insertOwner());
         // UMC.serializeAllDevices("devices.ser");
         // UMC.deserializeAllDevices("devices.ser");
         // UMC.showDevices();
 
+        UMC.startRandomFineSimulation();
+        // Mantener el programa vivo 30 segundos:
+        try {
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        UMC.stopRandomFineSimulation();
+        MVR.informFines();
 
         /*FineIssuerDevice fineIssuer;
         for (int i = 0; i < 10; i++) {

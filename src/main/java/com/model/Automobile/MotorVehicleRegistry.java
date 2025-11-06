@@ -21,20 +21,22 @@ public class MotorVehicleRegistry {
         return instance;
     }
 
-    public Automobile getRandomAutomobile(){
+    public Automobile getRandomAutomobile() {
         AutomobileDAO automobileDao = new AutomobileDAO();
-        Integer automobileId;
-        Automobile a = null;
         try {
-            automobileId = automobileDao.getAutomobileIdByLicensePlate("AB123CD");
-            a = automobileDao.getAutomobileByAutomobileID(automobileId);
+            Set<Automobile> autos = automobileDao.getAllAutomobiles();
+            if(autos.isEmpty())
+                return null;
+
+            List<Automobile> lista = new ArrayList<>(autos);
+            Random random = new Random();
+            return lista.get(random.nextInt(lista.size()));
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally{
-            return a;
         }
-
     }
+
     public void addBrand(Brand brand) {
         BrandsDAO brandDao = new BrandsDAO();
         ModelsDAO modelDao = new ModelsDAO();
@@ -89,6 +91,8 @@ public class MotorVehicleRegistry {
         }
         return scoring;
     }
+
+
 
     public void informFines() {
         Iterator<Automobile> it = automobilesInformation.keySet().iterator();
