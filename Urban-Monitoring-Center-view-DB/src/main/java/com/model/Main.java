@@ -24,7 +24,7 @@ public class Main {
 
         //MVR.loadAutomobilesFromDB();
         //System.out.println(UMC.insertOwner());
-        // UMC.serializeAllDevices("devices.ser");
+        // UMC.saveDevices("devices.ser");
         // UMC.deserializeAllDevices("devices.ser");
         // UMC.showDevices();
 

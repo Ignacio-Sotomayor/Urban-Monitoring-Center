@@ -67,7 +67,7 @@ public abstract class Device implements Serializable {
     }
     @Override
     public String toString() {
-        return "id: " + id + ", Device Type: "+ getClass().getSimpleName()+ "address: " + address + ", state: " + stateToString(state) + ", location: " + location;
+        return "id: " + id + ", Device Type: "+ getClass().getSimpleName()+ "address: " + address + ", state: " + stateToString() + ", location: " + location;
     }
 
 }

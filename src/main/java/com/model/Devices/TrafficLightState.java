@@ -1,8 +1,18 @@
 package com.model.Devices;
 
 public enum TrafficLightState {
-    RED,
-    GREEN,
-    INTERMITTENT,
-    UNKNOWN
+    RED("TrafficLightRed.png"),
+    GREEN("TrafficLightGreen.png"),
+    INTERMITTENT("InoperativeTrafficLight.png"),
+    UNKNOWN("FatalErrorTrafficLight.png");
+
+    private final String iconPath;
+
+    TrafficLightState(String iconPath) {
+        this.iconPath = iconPath;
+    }
+
+    public String getIconPath() {
+        return "/Icons/" + iconPath;
+    }
 }

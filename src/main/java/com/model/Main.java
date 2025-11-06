@@ -21,17 +21,13 @@ public class Main {
         UrbanMonitoringCenter UMC = UrbanMonitoringCenter.getUrbanMonitoringCenter();
 
         MVR.loadAutomobilesFromDB();
-        // UMC.saveDevicesState("devices.ser");
         UMC.loadInfractionTypes();
-        //System.out.println(UMC.insertOwner());
-        // UMC.serializeAllDevices("devices.ser");
-        // UMC.deserializeAllDevices("devices.ser");
-        // UMC.showDevices();
+
 
         UMC.startRandomFineSimulation();
-        // Mantener el programa vivo 30 segundos:
+        // Mantener el programa vivo 3 segundos:
         try {
-            Thread.sleep(30000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

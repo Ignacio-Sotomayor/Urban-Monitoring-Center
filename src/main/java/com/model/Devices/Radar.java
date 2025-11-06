@@ -6,6 +6,7 @@ import com.model.Automobile.Automobile;
 import com.controller.UrbanMonitoringCenter;
 
 import java.io.Serial;
+import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -39,5 +40,12 @@ public class Radar extends FineIssuerDevice {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public String getIconPath() {
+        String path = (getState())?"/Icons/OperativeRadar.png" : "/Icons/InoperativeRadar.png";
+        URL resource = getClass().getResource(path);
+        return resource != null ? resource.toExternalForm() : "";
     }
 }

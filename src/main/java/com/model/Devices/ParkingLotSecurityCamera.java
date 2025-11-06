@@ -3,6 +3,7 @@ package com.model.Devices;
 import com.controller.UrbanMonitoringCenter;
 
 import java.io.Serial;
+import java.net.URL;
 import java.time.Duration;
 
 public class ParkingLotSecurityCamera extends FineIssuerDevice {
@@ -15,4 +16,10 @@ public class ParkingLotSecurityCamera extends FineIssuerDevice {
         this.toleranceTime = toleranceTime;
     }
 
+    @Override
+    public String getIconPath() {
+        String path = (getState())?"/Icons/OperativeParkingLotCamera.png" : "/Icons/InoperativeParkingLotCamera.png";
+        URL resource = getClass().getResource(path);
+        return resource != null ? resource.toExternalForm() : "";
+    }
 }

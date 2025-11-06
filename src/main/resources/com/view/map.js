@@ -1,28 +1,14 @@
 // Inicializar el mapa y establecer la vista inicial en Mar del Plata, Argentina
-var map = L.map('map').setView([-38.0055, -57.5426], 13);
+var map = L.map('map', {
+    minZoom: 15,
+    maxZoom: 20
+}).setView([-38.00033863056437, -57.556192022806705], 17);
 
 // Objeto para guardar una referencia a cada marcador por su ID
 var markers = {};
-
-// --- Variables globales para los iconos ---
-var operativeIcon = L.icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize:    [25, 41],
-    iconAnchor:  [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize:  [41, 41]
-});
-
-var nonOperativeIcon = L.icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize:    [25, 41],
-    iconAnchor:  [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize:  [41, 41]
-});
-
+var repairQueue = [];
+var repairIntermittentQueue = [];
+var normalModeQueue = []; // New queue for switching to normal mode
 
 // Añadir una capa de mapa base de OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -38,10 +24,18 @@ function setMarkers(devices) {
     devices.forEach(function(device) {
         if (device.lat === undefined || device.lon === undefined) return;
 
-        var initialIcon = (device.status === 'OPERATIVO') ? operativeIcon : nonOperativeIcon;
-        var marker = L.marker([device.lat, device.lon], {icon: initialIcon}).addTo(map);
-        
-        var popupContent = device.popup + "<br><b>Estado:</b> " + device.status;
+        var customIcon = L.icon({
+            iconUrl: device.icon,
+            iconSize:    [25, 41],
+            iconAnchor:  [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            shadowSize:  [41, 41]
+        });
+
+        var marker = L.marker([device.lat, device.lon], {icon: customIcon}).addTo(map);
+
+        var popupContent = createPopupContent(device);
         marker.bindPopup(popupContent);
 
         markers[device.id] = marker;
@@ -51,13 +45,73 @@ function setMarkers(devices) {
 /**
  * Función llamada por Java para actualizar el estado de un marcador existente.
  */
-function updateMarkerState(deviceId, newStatus, newPopupText) {
+function updateMarkerState(deviceId, newStatus, newPopupText, newIconUrl, deviceType) {
     var marker = markers[deviceId];
     if (!marker) return;
 
-    var newIcon = (newStatus === 'OPERATIVO') ? operativeIcon : nonOperativeIcon;
+    var newIcon = L.icon({
+        iconUrl: newIconUrl,
+        iconSize:    [25, 41],
+        iconAnchor:  [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        shadowSize:  [41, 41]
+    });
+
     marker.setIcon(newIcon);
 
-    var newPopupContent = newPopupText + "<br><b>Estado:</b> " + newStatus;
+    var device = { id: deviceId, popup: newPopupText, status: newStatus, type: deviceType };
+    var newPopupContent = createPopupContent(device);
     marker.setPopupContent(newPopupContent);
+}
+
+function createPopupContent(device) {
+    var content = device.popup + "<br><b>Estado:</b> " + device.status;
+    if (device.status !== 'OPERATIVO') {
+        if (device.type === 'TrafficLightController') {
+            content += `<br><button onclick="queueForRepair('${device.id}', 'normal')">Reparar (Normal)</button>`;
+            content += `<br><button onclick="queueForRepair('${device.id}', 'intermittent')">Reparar (Intermitente)</button>`;
+        } else {
+            content += `<br><button onclick="queueForRepair('${device.id}', 'normal')">Reparar Dispositivo</button>`;
+        }
+    } else if (device.type === 'TrafficLightController' && device.popup.includes('MODO INTERMITENTE')) {
+        content += `<br><button onclick="queueForNormalMode('${device.id}')">Cambiar a Modo Normal</button>`;
+    }
+    return content;
+}
+
+function queueForRepair(deviceId, repairType) {
+    if (repairType === 'intermittent') {
+        if (!repairIntermittentQueue.includes(deviceId)) {
+            repairIntermittentQueue.push(deviceId);
+        }
+    } else {
+        if (!repairQueue.includes(deviceId)) {
+            repairQueue.push(deviceId);
+        }
+    }
+}
+
+function queueForNormalMode(deviceId) {
+    if (!normalModeQueue.includes(deviceId)) {
+        normalModeQueue.push(deviceId);
+    }
+}
+
+function getAndClearRepairQueue() {
+    var queue = [...repairQueue];
+    repairQueue = [];
+    return JSON.stringify(queue);
+}
+
+function getAndClearIntermittentRepairQueue() {
+    var queue = [...repairIntermittentQueue];
+    repairIntermittentQueue = [];
+    return JSON.stringify(queue);
+}
+
+function getAndClearNormalModeQueue() {
+    var queue = [...normalModeQueue];
+    normalModeQueue = [];
+    return JSON.stringify(queue);
 }

@@ -1,5 +1,6 @@
 package com.view;
 
+import com.controller.UrbanMonitoringCenter;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 
@@ -44,8 +45,11 @@ public class StartWindow extends JFrame {
         add(baseBrandStartButton);
     }
     public static void main(String[] args){
+        UrbanMonitoringCenter.getUrbanMonitoringCenter().startSimulations();
+
         new JFXPanel();
         Platform.setImplicitExit(false);
+
 
         SwingUtilities.invokeLater(()->{
             new StartWindow().setVisible(true);

@@ -34,10 +34,6 @@ public class EventGeolocation {
     }
 
     public Device getDevice(){  return this.device; }
-    //setters
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     @Override
     public String toString() {

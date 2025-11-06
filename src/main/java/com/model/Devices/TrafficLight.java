@@ -19,6 +19,7 @@ public class TrafficLight implements Serializable {
         this.street = street;
         this.orientation = orientation;
         this.isMain = isMain;
+        currentState = (isMain)?TrafficLightState.GREEN:TrafficLightState.RED;
     }
 
     //getters

@@ -4,6 +4,7 @@ import com.DAO.SecurityNoticeDAO;
 import com.model.Service;
 
 import java.io.Serial;
+import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -16,6 +17,13 @@ public class SecurityCamera extends Device{
 
     public SecurityCamera(String address, Location location, boolean state) {
         super(address, location,state);
+    }
+
+    @Override
+    public String getIconPath() {
+        String path = (getState())?"/Icons/OperativeSecurityCamera.png" : "/Icons/InoperativeSecurityCamera.png";
+        URL resource = getClass().getResource(path);
+        return resource != null ? resource.toExternalForm() : "";
     }
 
     public void issueSecurityNotice(String description, Set<Service> services){

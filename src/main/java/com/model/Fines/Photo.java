@@ -12,11 +12,6 @@ public class Photo {
         return path;
     }
 
-    //setters
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

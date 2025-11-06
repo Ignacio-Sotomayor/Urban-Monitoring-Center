@@ -1,7 +1,5 @@
 package com.model.Devices;
 
-import com.controller.UrbanMonitoringCenter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -14,6 +12,7 @@ public abstract class Device implements Serializable {
     private String address;
     private boolean state;
     private Location location;
+
 
     public Device (String address, Location location,boolean state ){
         this.id = UUID.randomUUID();
@@ -35,6 +34,11 @@ public abstract class Device implements Serializable {
     public UUID getId() { return this.id; }
     public boolean getState(){ return state; }
 
+    public void setState(boolean state) {
+        this.state = state;
+    }
+    public abstract String getIconPath();
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -54,7 +58,7 @@ public abstract class Device implements Serializable {
         this.state = true;
     }
 
-    public String stateToString(boolean state){
+    public String stateToString(){
         if (state){
             return "Operative";
         }
@@ -64,7 +68,7 @@ public abstract class Device implements Serializable {
     }
     @Override
     public String toString() {
-        return "id: " + id + ", Device Type: "+ getClass().getSimpleName()+ "address: " + address + ", state: " + stateToString(state) + ", location: " + location;
+        return "id: " + id + ", Device Type: "+ getClass().getSimpleName()+ "address: " + address + ", state: " + stateToString() + ", location: " + location;
     }
 
 }

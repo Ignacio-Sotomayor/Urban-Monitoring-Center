@@ -7,7 +7,6 @@ import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import netscape.javascript.JSObject;
 
 import java.net.URL;
 import java.util.*;
@@ -26,12 +25,6 @@ public class MapController {
         this.webView = webView;
     }
 
-    public class JavaConnector {
-        public void updateCursorPosition(String coordinates) {
-            System.out.println("Cursor position: " + coordinates); // Log to console instead
-        }
-    }
-
     public void setDeviceData(List<Device> devices) {
         this.devices = new ArrayList<>(devices);
     }
@@ -42,8 +35,6 @@ public class MapController {
 
         webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                JSObject window = (JSObject) webEngine.executeScript("window");
-                window.setMember("javaConnector", new JavaConnector());
                 prepareAndSendInitialData();
                 startSimulation();
             }
@@ -61,21 +52,15 @@ public class MapController {
         new Thread(() -> {
             if (devices == null || devices.isEmpty()) return;
 
-            Random random = new Random();
-            UrbanMonitoringCenter umc = UrbanMonitoringCenter.getUrbanMonitoringCenter();
-
             String allDevicesJson = devices.stream()
-                .map(d -> {
-                    // 20% de probabilidad de que un dispositivo empiece como NO OPERATIVO
-                    boolean isOperative = random.nextDouble() > 0.02;
-                    String status = isOperative ? "OPERATIVO" : "NO OPERATIVO";
-                    if (!isOperative) {
-                        umc.issuedDevices(d);
-                    }
-                    return String.format(Locale.US, "{\"id\":\"%s\", \"lat\":%f, \"lon\":%f, \"popup\":\"%s\", \"status\":\"%s\"}",
-                        d.getAddress(), d.getLocation().getLatitude(), d.getLocation().getLongitude(), getPopupTextForDevice(d).replace("\"", "\\\""), status);
-                })
-                .collect(Collectors.joining(",", "[", "]"));
+                    .map(d -> {
+                        String status = d.getState() ? "OPERATIVO" : "NO OPERATIVO";
+                        String icon = getIconForDevice(d);
+                        String type = (d instanceof TrafficLightController) ? "TrafficLightController" : "Other";
+                        return String.format(Locale.US, "{\"id\":\"%s\", \"lat\":%f, \"lon\":%f, \"popup\":\"%s\", \"status\":\"%s\", \"icon\":\"%s\", \"type\":\"%s\"}",
+                                d.getId().toString(), d.getLocation().getLatitude(), d.getLocation().getLongitude(), getPopupTextForDevice(d).replace("\"", "\\\""), status, icon, type);
+                    })
+                    .collect(Collectors.joining(",", "[", "]"));
 
             Platform.runLater(() -> {
                 webEngine.executeScript(String.format("setMarkers(%s)", allDevicesJson));
@@ -84,8 +69,10 @@ public class MapController {
     }
 
     private void startSimulation() {
-        simulationTimer = new Timer(true); // Usar un hilo daemon
-        simulationTimer.schedule(new TimerTask() {
+        simulationTimer = new Timer(true);
+        UrbanMonitoringCenter umc = UrbanMonitoringCenter.getUrbanMonitoringCenter();
+
+        TimerTask failureTask = new TimerTask() {
             @Override
             public void run() {
                 if (devices == null || devices.isEmpty()) return;
@@ -93,31 +80,120 @@ public class MapController {
                 Random random = new Random();
                 Device deviceToChange = devices.get(random.nextInt(devices.size()));
 
-                UrbanMonitoringCenter umc = UrbanMonitoringCenter.getUrbanMonitoringCenter();
-                boolean isWorking = deviceToChange.getState();
+                if (umc.isFatalError(deviceToChange) || !deviceToChange.getState()) return;
 
-                String newStatus = isWorking ? "NO OPERATIVO" : "OPERATIVO";
-                if (isWorking) {
+                if (random.nextDouble() < 0.05) {
+                    umc.setFatalError(deviceToChange);
+                } else {
                     umc.issuedDevices(deviceToChange);
                 }
+            }
+        };
 
-                String popupText = getPopupTextForDevice(deviceToChange);
+        TimerTask uiUpdateTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (devices == null || devices.isEmpty()) return;
 
+                // Check for repair requests
                 Platform.runLater(() -> {
-                    String script = String.format(Locale.US, "updateMarkerState(\"%s\", \"%s\", \"%s\")",
-                        deviceToChange.getAddress(), newStatus, popupText.replace("\"", "\\\""));
-                    webEngine.executeScript(script);
+                    processRepairQueue("getAndClearRepairQueue", false);
+                    processRepairQueue("getAndClearIntermittentRepairQueue", true);
+                    processRepairQueue("getAndClearNormalModeQueue", false); // Re-uses the normal repair logic
+                });
+
+                // Update UI for all devices
+                devices.forEach(d -> {
+                    String status = umc.isFatalError(d) ? "ERROR FATAL" : (d.getState() ? "OPERATIVO" : "NO OPERATIVO");
+                    String popupText = getPopupTextForDevice(d);
+                    String icon = d.getIconPath();
+
+
+                    Platform.runLater(() -> {
+                        String script = String.format(Locale.US, "updateMarkerState(\"%s\", \"%s\", \"%s\", \"%s\")",
+                                d.getId().toString(), status, popupText.replace("\"", "\\\""), icon);
+                        webEngine.executeScript(script);
+                    });
                 });
             }
-        }, 3000, 3000); // Cambiado de 10000 a 3000
+        };
+
+        simulationTimer.schedule(failureTask, 10000, 10000);
+        simulationTimer.schedule(uiUpdateTask, 250, 250);
+    }
+
+    private void processRepairQueue(String getQueueFunction, boolean isIntermittent) {
+        UrbanMonitoringCenter umc = UrbanMonitoringCenter.getUrbanMonitoringCenter();
+        Object result = webEngine.executeScript(getQueueFunction + "()");
+        if (result instanceof String && !((String) result).equals("[]")) {
+            String json = (String) result;
+            String[] ids = json.replace("[", "").replace("]", "").replace("\"", "").split(",");
+            for (String idStr : ids) {
+                try {
+                    UUID id = UUID.fromString(idStr.trim());
+                    Device device = umc.getSpecificDevice(id);
+                    if (device != null) {
+                        if (isIntermittent) {
+                            umc.repairToIntermittent(device);
+                        } else {
+                            umc.repairDevices(device);
+                        }
+                    }
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Error parsing UUID from JS: " + idStr);
+                }
+            }
+        }
+    }
+
+    private String getIconForDevice(Device device) {
+        UrbanMonitoringCenter umc = UrbanMonitoringCenter.getUrbanMonitoringCenter();
+        if (umc.isFatalError(device)) {
+            return "/Icons/FatalErrorTrafficLight.png";
+        }
+
+        String iconPath = "";
+        boolean isOperative = device.getState();
+
+        if (device instanceof TrafficLightController) {
+            TrafficLightController tlc = (TrafficLightController) device;
+            if (!isOperative) {
+                iconPath = "/Icons/InoperativeTrafficLight.png";
+            } else if (tlc.isIntermittentTime()) {
+                iconPath = "/Icons/TrafficLightYellow.png";
+            } else {
+                iconPath = tlc.getIntersectionLights().get(0).getCurrentState().getIconPath();
+            }
+        } else if (device instanceof Radar) {
+            iconPath = isOperative ? "/Icons/OperativeRadar.png" : "/Icons/InoperativeRadar.png";
+        } else if (device instanceof ParkingLotSecurityCamera) {
+            iconPath = isOperative ? "/Icons/OperativeParkingLotCamera.png" : "/Icons/InoperativeParkingLotCamera.png";
+        } else if (device instanceof SecurityCamera) {
+            iconPath = isOperative ? "/Icons/OperativeSecurityCamera.png" : "/Icons/InoperativeSecurityCamera.png";
+        }
+
+        URL resource = getClass().getResource(iconPath);
+        return resource != null ? resource.toExternalForm() : "";
     }
 
     private String getPopupTextForDevice(Device device) {
         String type = "Dispositivo";
-        if (device instanceof TrafficLightController) type = "Controlador de Semáforos";
-        else if (device instanceof Radar) type = "Radar de Velocidad";
-        else if (device instanceof ParkingLotSecurityCamera) type = "Cámara de Aparcamiento";
-        else if (device instanceof SecurityCamera) type = "Cámara de Seguridad";
+        if (device instanceof TrafficLightController) {
+            type = "Controlador de Semáforos";
+            TrafficLightController tlc = (TrafficLightController) device;
+            if (tlc.isIntermittentTime()) {
+                type += "<br><b>MODO INTERMITENTE</b>";
+            } else {
+                type += "<br>Principal: " + tlc.getIntersectionLights().get(0).getCurrentState();
+                type += "<br>Secundario: " + tlc.getIntersectionLights().get(1).getCurrentState();
+            }
+        } else if (device instanceof Radar) {
+            type = "Radar de Velocidad";
+        } else if (device instanceof ParkingLotSecurityCamera) {
+            type = "Cámara de Aparcamiento";
+        } else if (device instanceof SecurityCamera) {
+            type = "Cámara de Seguridad";
+        }
         return "<b>" + device.getAddress() + "</b><br>" + type;
     }
 
@@ -125,6 +201,5 @@ public class MapController {
         if (simulationTimer != null) {
             simulationTimer.cancel();
         }
-        UrbanMonitoringCenter.getUrbanMonitoringCenter().saveDevices("devices.ser");
     }
 }

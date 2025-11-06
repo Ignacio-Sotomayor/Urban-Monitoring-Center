@@ -8,7 +8,7 @@ public class DBConnection {
 
     private static final String jdbcUrl = "jdbc:postgresql://localhost:5432/umcDB";
     private static final String username = "postgres";
-    private static final String password = "Aladarysol6";
+    private static final String password = "1234";
 
     public static synchronized Connection getConnection() throws SQLException {
         return DriverManager.getConnection(jdbcUrl, username, password);
