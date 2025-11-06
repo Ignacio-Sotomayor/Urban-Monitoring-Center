@@ -11,6 +11,7 @@ module com.view {
     requires org.jetbrains.annotations;
     requires java.desktop;
     requires java.sql;
+    requires itextpdf;
 
     opens com.view to javafx.fxml;
     exports com.view;

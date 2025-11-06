@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InfractionTypesDAO {
     public InfractionType getInfractionTypeByID(Integer InfractionTypeID) throws SQLException {
@@ -92,4 +94,32 @@ public class InfractionTypesDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public List<InfractionType> getAllInfractionTypes() throws SQLException {
+        String sql = "SELECT InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount, surchangePer10PercentExcess FROM InfractionTypes";
+
+        List<InfractionType> list = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                String name = rs.getString("InfractionType_Name");
+                String desc = rs.getString("InfractionType_Description");
+                int scoring = rs.getInt("InfractionType_Scoring");
+                BigDecimal amount = rs.getBigDecimal("InfractionType_Amount");
+                BigDecimal surcharge = rs.getBigDecimal("surchangePer10PercentExcess");
+
+                if (surcharge != null) {
+                    list.add(new ExcessiveSpeed(desc, amount, scoring, surcharge));
+                } else {
+                    list.add(new InfractionType(name, desc, amount, scoring));
+                }
+            }
+        }
+
+        return list;
+    }
+
 }

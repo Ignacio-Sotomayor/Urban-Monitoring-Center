@@ -11,7 +11,7 @@ public class ParkingLotSecurityCamera extends FineIssuerDevice {
     private Duration toleranceTime;
 
     public ParkingLotSecurityCamera( String address, Location location,boolean state, Duration toleranceTime) {
-        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("ParkingOvertime"));
+        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("ParkingOverTime"));
         this.toleranceTime = toleranceTime;
     }
 

@@ -30,7 +30,7 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
     // secondaryLight -> index=1
 
     public TrafficLightController( String address, Location location,boolean state, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
-        super(address, location, state,UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+        super(address, location, state,UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("RedLightViolation"));
         this.redLightDuration = redLightDuration;
         this.yellowLightDuration = yellowLightDuration;
         this.greenLightDuration = greenLightDuration;
