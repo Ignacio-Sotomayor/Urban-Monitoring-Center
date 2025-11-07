@@ -13,4 +13,5 @@ public class DBConnection {
     public static synchronized Connection getConnection() throws SQLException {
         return DriverManager.getConnection(jdbcUrl, username, password);
     }
+
 }

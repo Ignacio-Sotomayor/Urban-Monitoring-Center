@@ -1,22 +1,18 @@
 package com.model.Automobile;
-import com.DAO.AutomobileDAO;
-import com.DAO.FineDAO;
-import com.DAO.InfractionTypesDAO;
+import com.DAO.*;
 import com.model.Fines.*;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 
 public class MotorVehicleRegistry {
     private static final String name = "Mar del Plata Car Dealership";
-    private final Set<Brand> brands;
     private final Map<Automobile,List<Fine>> automobilesInformation;
     private static MotorVehicleRegistry instance = null;
-    private final Set<Fine> recentFines;
 
     private MotorVehicleRegistry(){
-        this.brands = new TreeSet<>();
         this.automobilesInformation = new TreeMap<Automobile,List<Fine>>();
-        recentFines = HashSet.newHashSet(10);
     }
 
     public static MotorVehicleRegistry getMotorVehicleRegistry(){
@@ -25,69 +21,68 @@ public class MotorVehicleRegistry {
         return instance;
     }
 
-    public static void Initialize() {
-        MotorVehicleRegistry registry = getMotorVehicleRegistry();
+    public Automobile getRandomAutomobile() {
+        AutomobileDAO automobileDao = new AutomobileDAO();
+        try {
+            Set<Automobile> autos = automobileDao.getAllAutomobiles();
+            if(autos.isEmpty())
+                return null;
 
-        Brand toyota = new Brand("Toyota");
-        Model corolla = new Model("Corolla");
-        Model hilux = new Model("Hilux");
-        toyota.addModel(corolla);
-        toyota.addModel(hilux);
+            List<Automobile> lista = new ArrayList<>(autos);
+            Random random = new Random();
+            return lista.get(random.nextInt(lista.size()));
 
-        Brand ford = new Brand("Ford");
-        Model focus = new Model("Focus");
-        Model ranger = new Model("Ranger");
-        ford.addModel(focus);
-        ford.addModel(ranger);
-
-        Brand chevrolet = new Brand("Chevrolet");
-        Model cruze = new Model("Cruze");
-        Model onix = new Model("Onix");
-        chevrolet.addModel(cruze);
-        chevrolet.addModel(onix);
-
-        registry.addBrand(toyota);
-        registry.addBrand(ford);
-        registry.addBrand(chevrolet);
-
-        // People
-        Owner alice = new Owner("Alice Johnson", "32145678", "123 Elm Street");
-        Owner bob = new Owner("Bob Smith", "23456789", "456 Oak Avenue");
-        Owner carol = new Owner("Carol White", "34567890", "789 Maple Blvd");
-
-        // Automobiles
-        Automobile car1 = new Automobile("ABC123", toyota, corolla, alice, 2020);
-        Automobile car2 = new Automobile("XYZ789", ford, ranger, bob, 2022);
-        Automobile car3 = new Automobile("LMN456", chevrolet, onix, carol, 2019);
-        Automobile car4 = new Automobile("QWE987", toyota, hilux, alice, 2021);
-
-        registry.addAutomobile(car1);
-        registry.addAutomobile(car2);
-        registry.addAutomobile(car3);
-        registry.addAutomobile(car4);
-    }
-
-    public Automobile getRandomAutomobile(){
-        Random random = new Random();
-        ArrayList<Automobile> automobiles = new ArrayList<>(automobilesInformation.keySet());
-        return automobiles.get(random.nextInt(automobiles.size()));
-    }
-
-    public void addBrand(Brand brand) { brands.add(brand); }
-    public void addAutomobile(Automobile a) { automobilesInformation.put(a,new ArrayList<>()); }
-    public void addFineToAutomobile(Automobile a, Fine f) { automobilesInformation.get(a).add(f); }
-    public void addFineToDB(Fine f){
-        FineDAO.insertFine(f.getAmount(),f.getScoring(), InfractionTypesDAO.getInfractionTypeIdByName(f.getInfractionType().getName()), AutomobileDAO.getAutomobileIdByLicensePlate(f.getAutomobile().getLicensePlate()), GeoLocationDAO.getGeoLocation());
-
-    }
-
-
-    public void showAllAutomobiles() {
-        for (Automobile a : automobilesInformation.keySet()) {
-            System.out.println(a);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    public void addBrand(Brand brand) {
+        BrandsDAO brandDao = new BrandsDAO();
+        ModelsDAO modelDao = new ModelsDAO();
+        try{
+            Integer brandID = brandDao.insertBrand(brand.getName());
+            for (Iterator it = brand.getModels(); it.hasNext(); ) {
+                Model m = (Model) it.next();
+                modelDao.insertModel(m.getName(), brandID);
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+    public void addAutomobile(Automobile a) {
+        automobilesInformation.put(a,new ArrayList<>());
+        AutomobileDAO automobileDao = new AutomobileDAO();
+        ModelsDAO modelDao = new ModelsDAO();
+        OwnersDAO ownerDao = new OwnersDAO();
+        try{
+            Integer modelId = modelDao.getModelIdByName(a.getModel().getName());
+            Integer ownerId = ownerDao.getOwnerIdByLegalID(a.getOwner().getLegalIid());
+            automobileDao.insertAutomobile(a.getLicensePlate(),a.getYear(),modelId,ownerId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void showAllAutomobiles() {
+        for (Automobile a : automobilesInformation.keySet()) {
+            System.out.println(a.toString());
+        }
+    }
+    public void loadAutomobilesFromDB(){
+        AutomobileDAO automobileDAO = new AutomobileDAO();
+        FineDAO fineDao = new FineDAO();
+        int id;
+        try {
+            Set<Automobile> automobiles = automobileDAO.getAllAutomobiles();
+            for (Automobile a : automobiles) {
+                id = automobileDAO.getAutomobileIdByLicensePlate(a.getLicensePlate());
+                automobilesInformation.put(a,fineDao.getAllFinesFromAutomobile(id).stream().toList() );
+            }
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+    }
     public int getScoring(Automobile a) {
         int scoring = 20;
         List<Fine> fines = automobilesInformation.get(a);
@@ -96,6 +91,8 @@ public class MotorVehicleRegistry {
         }
         return scoring;
     }
+
+
 
     public void informFines() {
         Iterator<Automobile> it = automobilesInformation.keySet().iterator();

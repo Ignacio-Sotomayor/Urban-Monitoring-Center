@@ -1,7 +1,5 @@
 package com.model.Devices;
 
-import com.model.UrbanMonitoringCenter;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -14,6 +12,7 @@ public abstract class Device implements Serializable {
     private String address;
     private boolean state;
     private Location location;
+
 
     public Device (String address, Location location,boolean state ){
         this.id = UUID.randomUUID();
@@ -35,11 +34,12 @@ public abstract class Device implements Serializable {
     public UUID getId() { return this.id; }
     public boolean getState(){ return state; }
 
-    public void fail(){
-        this.state = false;
-        System.out.format("The device %d stopped working \n",id);
-        UrbanMonitoringCenter.getUrbanMonitoringCenter().issuedDevices(this);
+    public void setState(boolean state) {
+        this.state = state;
     }
+    public abstract String getIconPath();
+    public abstract String getDeviceTypeName();
+    public abstract String getDeviceSpecificInfo();
 
     @Override
     public boolean equals(Object o) {
@@ -53,11 +53,14 @@ public abstract class Device implements Serializable {
         return Objects.hashCode(id);
     }
 
-    public void setState(boolean state) {
-        this.state = state;
+    public void breakDevice() {
+        this.state = false;
+    }
+    public void repair(){
+        this.state = true;
     }
 
-    public String stateToString(boolean state){
+    public String stateToString(){
         if (state){
             return "Operative";
         }
@@ -67,7 +70,8 @@ public abstract class Device implements Serializable {
     }
     @Override
     public String toString() {
-        return "id: " + id + ", Device Type: "+ getClass().getSimpleName()+ "address: " + address + ", state: " + stateToString(state) + ", location: " + location;
+        return "Device Type: "+ getClass().getSimpleName()+ "    address: " + address + ",   state: " + stateToString() + ",   location: " + location
+                + "\n Id (" + id + ") \n";
     }
 
 }

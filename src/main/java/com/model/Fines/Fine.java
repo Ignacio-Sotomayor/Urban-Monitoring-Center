@@ -48,6 +48,7 @@ public class Fine {
     public Integer getFine_Id() {
         return fine_Id;
     }
+    
 
     public void addPhoto(Photo photo) {
         photos.add(photo);

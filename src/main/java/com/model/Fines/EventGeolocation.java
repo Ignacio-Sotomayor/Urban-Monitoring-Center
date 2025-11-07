@@ -13,21 +13,32 @@ public class EventGeolocation {
     private final Location location;
 
 
-    public EventGeolocation(LocalDateTime dateTime, String address, Location location, Device device) {
+    public EventGeolocation(LocalDateTime dateTime, String address, Device device, Location location) {
         this.dateTime = dateTime;
         this.address = address;
         this.device = device;
         this.location = location;
     }
 
+    public EventGeolocation(LocalDateTime dateTime, String address, Location location) {
+        this.dateTime = dateTime;
+        this.address = address;
+        this.device = null;
+        this.location = location;
+    }
+
     //getters
     public LocalDateTime getDateTime() {
-  return this.dateTime;
- }
+        return this.dateTime;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
     public String getAddress() {
-  return this.address;
- }
-    public Device getDevice(){  return this.device; }
+        return address;
+    }
 
     @Override
     public String toString() {

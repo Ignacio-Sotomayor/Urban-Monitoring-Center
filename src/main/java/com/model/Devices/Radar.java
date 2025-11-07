@@ -1,9 +1,15 @@
 package com.model.Devices;
 
+import com.DAO.AutomobileDAO;
+import com.DAO.FineDAO;
 import com.model.Automobile.Automobile;
-import com.model.UrbanMonitoringCenter;
+import com.controller.UrbanMonitoringCenter;
 
 import java.io.Serial;
+import java.net.URL;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 public class Radar extends FineIssuerDevice {
     @Serial
@@ -11,16 +17,48 @@ public class Radar extends FineIssuerDevice {
     private double speedLimit;
 
     public Radar( String address, Location location,boolean state, double speedLimit) {
-        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("ExcessiveSpeed"));
+        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("Speeding"));
         this.speedLimit = speedLimit;
     }
 
+    public void setEmittedInfractionType(){
+        super.setEmittedInfractionType(UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("Speeding"));
+    }
     public void setSpeedLimit(double speedLimit) {
         this.speedLimit = speedLimit;
     }
     public void issueFine(Automobile a, double speed) {
         if (speed > speedLimit) {
-            super.issueFine(a);
+            try{
+            AutomobileDAO automobileDao = new AutomobileDAO();
+            Integer automobileId = automobileDao.getAutomobileIdByLicensePlate(a.getLicensePlate());
+            automobileDao =null;
+
+            FineDAO fineDao = new FineDAO();
+            fineDao.insertSpeedingFine(super.getEmitedInfractionType().getAmount(),super.getEmitedInfractionType().getScoring(),
+                    super.getLocation().getLatitude(),super.getLocation().getLongitude(),super.getAddress(), Timestamp.from(Instant.now()),
+                    super.getId().toString(),automobileId,Integer.parseInt(String.valueOf(this.speedLimit)),Integer.parseInt(String.valueOf(speed)));
+            fineDao = null;
+        }catch(SQLException e){
+                throw new RuntimeException(e);
+            }
         }
+    }
+
+    @Override
+    public String getIconPath() {
+        String path = (getState())?"/Icons/OperativeRadar.png" : "/Icons/InoperativeRadar.png";
+        URL resource = getClass().getResource(path);
+        return resource != null ? resource.toExternalForm() : "";
+    }
+
+    @Override
+    public String getDeviceTypeName() {
+        return "Radar";
+    }
+
+    @Override
+    public String getDeviceSpecificInfo() {
+        return "<br>Límite de velocidad: " + speedLimit + " km/h";
     }
 }
