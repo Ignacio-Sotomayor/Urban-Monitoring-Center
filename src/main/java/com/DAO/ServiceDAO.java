@@ -31,19 +31,19 @@ public class ServiceDAO {
             pstmt.executeUpdate();
         }
     }
-    public int getServiceIdByPhone(String name, String phoneNumber) throws SQLException{
+    public int getServiceIdByPhone(String phoneNumber) throws SQLException {
         String sql = "SELECT Service_ID FROM Services WHERE Service_PhoneNumber = ?";
 
-        try(Connection conn = DBConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)
-        ){
-            pstmt.setString(1, name);
-            pstmt.setString(2,phoneNumber);
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, phoneNumber);
 
             ResultSet rs = pstmt.executeQuery();
-            return rs.next()? rs.getInt("Service_ID"):-1;
+            return rs.next() ? rs.getInt("Service_ID") : -1;
         }
     }
+
     public Service getServiceByID(Integer serviceID)throws SQLException{
         String sql = "Select * FROM Services WHERE Service_ID = ?";
 

@@ -2,19 +2,24 @@ package com.controller;
 import com.DAO.FineDAO;
 import com.DAO.InfractionTypesDAO;
 import com.DAO.OwnersDAO;
+import com.DAO.SecurityNoticeDAO;
 import com.model.Automobile.Automobile;
 import com.model.Automobile.MotorVehicleRegistry;
 import com.model.Devices.*;
 import com.model.FailureRecord;
+import com.model.Fines.EventGeolocation;
 import com.model.Fines.Fine;
 import com.model.Fines.InfractionType;
 import com.model.SecurityNotice;
+import com.model.Service;
+import java.util.Queue;
+
 import java.io.*;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Duration;
-
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,10 +41,10 @@ public class UrbanMonitoringCenter {
     private boolean failureRunning = false;
     private final Object failureSimulationLock = new Object();
 
-    private static final int MIN_FINE_INTERVAL = 5;   // en segundos
-    private static final int MAX_FINE_INTERVAL = 15;  // en segundos
-    private static final int MIN_FAILURE_INTERVAL = 10; // segundos
-    private static final int MAX_FAILURE_INTERVAL = 30; // segundos
+    private static final int MIN_FINE_INTERVAL = 5;   // seconds
+    private static final int MAX_FINE_INTERVAL = 15;  // seconds
+    private static final int MIN_FAILURE_INTERVAL = 10; // seconds
+    private static final int MAX_FAILURE_INTERVAL = 30; // seconds
     private static final double FATAL_ERROR_PROBABILITY = 0.2; // 20% chance for a fatal error
 
     private UrbanMonitoringCenter(){
@@ -56,6 +61,15 @@ public class UrbanMonitoringCenter {
 
     public void addSecurityNotice(SecurityNotice notice){ securityNotices.add(notice); }
 
+    public void createAndSaveSecurityNotice(Device device, String description, Set<Service> services) {
+        SecurityNoticeDAO securityNoticeDao = new SecurityNoticeDAO();
+        try {
+            securityNoticeDao.insertSecurityNotice(description, Timestamp.valueOf(LocalDateTime.now()), device.getAddress(), device.getLocation().getLatitude(), device.getLocation().getLongitude(), device.getId().toString(), services);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     //getters
     public static UrbanMonitoringCenter getUrbanMonitoringCenter(){
         if(instance == null)
@@ -66,7 +80,7 @@ public class UrbanMonitoringCenter {
     public HashMap<UUID,Device> getDevices() { return devices; }
     public Iterator<SecurityNotice> getSecurityNotices() { return securityNotices.iterator(); }
     public List<FailureRecord> getFailureRecords() {
-        // Devolver una copia para evitar ConcurrentModificationException
+        // Return a copy to avoid ConcurrentModificationException
         return new ArrayList<>(failureRecords);
     }
 
@@ -123,6 +137,7 @@ public class UrbanMonitoringCenter {
         }
         return null;
     }
+
     public static void baseBrandStart(){
         UrbanMonitoringCenter UMC = getUrbanMonitoringCenter();
         TrafficLightController tf;
@@ -180,6 +195,8 @@ public class UrbanMonitoringCenter {
         UMC.devices.put(secCamera.getId(),secCamera);
         secCamera = new SecurityCamera("25 de Mayo 2700",new Location(BigDecimal.valueOf(-37.997282),BigDecimal.valueOf(-57.54628)),true);
         UMC.devices.put(secCamera.getId(),secCamera);
+        secCamera = new SecurityCamera("Rivadavia 3300", new Location(BigDecimal.valueOf(-37.997841), BigDecimal.valueOf(-57.552919)), true);
+        UMC.devices.put(secCamera.getId(), secCamera);
 
         ParkingLotSecurityCamera plCamera;
         //ParkingLotSecurityCameras

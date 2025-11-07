@@ -29,7 +29,7 @@ public class TrafficLight implements Serializable {
         this.street = street;
         this.orientation = orientation;
         this.isMain = isMain;
-        this.operative = true; // Por defecto, la luz está operativa
+        this.operative = true; // Operative by default
         currentState = (isMain)?TrafficLightState.GREEN:TrafficLightState.RED;
     }
 
@@ -46,9 +46,9 @@ public class TrafficLight implements Serializable {
     }
 
     public void changeState(TrafficLightState newState) {
-        // Si el estado actual es UNKNOWN, la luz está en un error fatal y no puede cambiar de estado.
+        // If traffic light state is UNKNOWN, it is a fatal error and cannot be repaired
         if (this.currentState == TrafficLightState.UNKNOWN) {
-            return; // No se puede cambiar el estado de una luz en error fatal
+            return;
         }
 
         if (newState == TrafficLightState.UNKNOWN) {
@@ -58,7 +58,7 @@ public class TrafficLight implements Serializable {
             this.operative = false;
             this.currentState = TrafficLightState.INOPERATIVE;
         } else {
-            // Si estaba inoperativa y se le pide un estado operativo, se considera reparada
+            // If it was INOPERATIVE, it is repaired when told
             if (!this.operative && (newState == TrafficLightState.RED || newState == TrafficLightState.GREEN || newState == TrafficLightState.YELLOW || newState == TrafficLightState.INTERMITTENT)) {
                 this.operative = true;
             }

@@ -13,10 +13,17 @@ public class EventGeolocation {
     private final Location location;
 
 
-    public EventGeolocation(LocalDateTime dateTime, String address, Location location, Device device) {
+    public EventGeolocation(LocalDateTime dateTime, String address, Device device, Location location) {
         this.dateTime = dateTime;
         this.address = address;
         this.device = device;
+        this.location = location;
+    }
+
+    public EventGeolocation(LocalDateTime dateTime, String address, Location location) {
+        this.dateTime = dateTime;
+        this.address = address;
+        this.device = null;
         this.location = location;
     }
 

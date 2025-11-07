@@ -45,7 +45,7 @@ public class SecurityNoticeDAO {
                 String address = rs.getString("SecurityNotice_Address");
                 Timestamp timestamp = rs.getTimestamp("SecurityNotice_DateTime");
                 Location loc = new Location(lat, lon);
-                EventGeolocation geo = new EventGeolocation(timestamp.toLocalDateTime(), address, loc, targetDevice);
+                EventGeolocation geo = new EventGeolocation(timestamp.toLocalDateTime(), address, targetDevice, loc);
                 SecurityNotice notice = new SecurityNotice(description, geo);
                 notices.add(notice);
             }
@@ -53,60 +53,11 @@ public class SecurityNoticeDAO {
         return notices;
     }
 
-    public Set<SecurityNotice> getAllSecurityNoticesBetweenDates(Timestamp from, Timestamp to) throws SQLException {
-        String sql = "SELECT SecurityNotice_ID, SecurityNotice_Description, SecurityNotice_Latitude, SecurityNotice_Longitude, SecurityNotice_Address, SecurityNotice_DateTime, Issuer_DeviceUUID FROM SecurityNotices WHERE SecurityNotice_DateTime BETWEEN ? AND ? ORDER BY SecurityNotice_DateTime ASC ";
-
-        HashSet<SecurityNotice> notices = new HashSet<>();
-        SecurityNoticeDetailsDAO detailsDao = new SecurityNoticeDetailsDAO();
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setTimestamp(1, from);
-            pstmt.setTimestamp(2, to);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("SecurityNotice_ID");
-                String description = rs.getString("SecurityNotice_Description");
-                String address = rs.getString("SecurityNotice_Address");
-                Timestamp dateTime = rs.getTimestamp("SecurityNotice_DateTime");
-                java.math.BigDecimal latitude = rs.getBigDecimal("SecurityNotice_Latitude");
-                java.math.BigDecimal longitude = rs.getBigDecimal("SecurityNotice_Longitude");
-                String deviceUUIDStr = rs.getString("Issuer_DeviceUUID");
-
-                UUID deviceUUID = UUID.fromString(deviceUUIDStr);
-                Device device = UrbanMonitoringCenter.getUrbanMonitoringCenter()
-                        .getDevices()
-                        .get(deviceUUID);
-
-                if (device == null) continue;
-
-                Location location = new Location(latitude, longitude);
-
-                EventGeolocation eventGeo = new EventGeolocation(
-                        dateTime.toLocalDateTime(),
-                        address,
-                        location,
-                        device
-                );
-
-                Set<Service> services = detailsDao.getAllServicesForSecurityNotice(id);
-
-                SecurityNotice notice = new SecurityNotice(description, eventGeo, services);
-                notices.add(notice);
-            }
-        }
-
-        return notices;
-    }
-
     public int insertSecurityNotice(String description, Timestamp timestamp, String address, BigDecimal latitude, BigDecimal longitude, String UUID, Set<Service> calledServices) throws SQLException{
         String sql = "INSERT INTO SecurityNotices (SecurityNotice_Description, SecurityNotice_Latitude, SecurityNotice_Longitude, SecurityNotice_Address, SecurityNotice_DateTime, Issuer_DeviceUUID) VALUES (?, ?, ?, ?, ?, ?)";
         int SecurityNoticeID;
         try(Connection conn = DBConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         ){
             pstmt.setString(1,description);
             pstmt.setBigDecimal(2,latitude);
@@ -120,18 +71,18 @@ public class SecurityNoticeDAO {
             if(rs.next())
                 SecurityNoticeID = rs.getInt(1);
             else
-                throw new SQLException();
+                throw new SQLException("Creating security notice failed, no ID obtained.");
         }
         ServiceDAO serviceDao = new ServiceDAO();
         SecurityNoticeDetailsDAO detailsDao = new SecurityNoticeDetailsDAO();
         for(Service s: calledServices){
-            Integer serviceID = serviceDao.getServiceIdByPhone(s.getName(),s.getPhoneNumber());
+            Integer serviceID = serviceDao.getServiceIdByPhone(s.getPhoneNumber());
             detailsDao.insertSecurityNoticeDetail(SecurityNoticeID, serviceID);
         }
         return SecurityNoticeID;
     }
     public void deleteSecurityNotice(Integer SecurityNoticeID) throws SQLException{
-        String sql = "DELETE FROM SecurityNotices WHERE SecurityNotice_ID = ?)";
+        String sql = "DELETE FROM SecurityNotices WHERE SecurityNotice_ID = ?";
 
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -164,7 +115,7 @@ public class SecurityNoticeDAO {
         }
         SecurityNoticeDetailsDAO detailsDao = new SecurityNoticeDetailsDAO();
 
-        return new SecurityNotice(description, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(java.util.UUID.fromString(uuid))), detailsDao.getAllServicesForSecurityNotice(ID));
+        return new SecurityNotice(description, new EventGeolocation(timestamp.toLocalDateTime(),address, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(java.util.UUID.fromString(uuid)), new Location(latitude,longitude)), detailsDao.getAllServicesForSecurityNotice(ID));
     }
     public Set<SecurityNotice> getNSecurityNotice(int N)throws SQLException{
         SecurityNoticeDetailsDAO detailsDAO = new SecurityNoticeDetailsDAO();
@@ -185,7 +136,8 @@ public class SecurityNoticeDAO {
                 Timestamp timestamp = rs.getTimestamp("SecurityNotice_DateTime");
                 String uuid = rs.getString("Issuer_DeviceUUID");
 
-                SecurityNotice sn = new SecurityNotice(description,new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(java.util.UUID.fromString(uuid))), detailsDAO.getAllServicesForSecurityNotice(ID));
+                SecurityNotice sn = new SecurityNotice(description,new EventGeolocation(timestamp.toLocalDateTime(),address, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(java.util.UUID.fromString(uuid)), new Location(latitude,longitude)), detailsDAO.getAllServicesForSecurityNotice(ID));
+                securityNoticies.add(sn);
             }
         }
 

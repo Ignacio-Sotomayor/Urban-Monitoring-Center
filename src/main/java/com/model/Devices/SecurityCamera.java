@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Set;
+import java.util.HashSet;
 
 public class SecurityCamera extends Device{
 
@@ -43,5 +44,9 @@ public class SecurityCamera extends Device{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void triggerSecurityNotice() {
+        issueSecurityNotice("Security alert triggered by camera", new HashSet<>());
     }
 }
