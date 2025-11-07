@@ -88,9 +88,9 @@ public class DeviceEventsWindow extends JFrame {
         // === Multas del dispositivo ===
         FineDAO finesDAO = new FineDAO();
         Set<Fine> fines = finesDAO.getNFinesByDeviceUUIDBetweenDates(
-                Timestamp.valueOf("2000-01-01 00:00:00"),
-                Timestamp.valueOf("2100-01-01 00:00:00"),
-                Integer.MAX_VALUE,
+                Timestamp.valueOf("2025-01-01 00:00:00"),
+                Timestamp.valueOf("2025-12-31 23:59:59"),
+                10,
                 0,
                 device.getId()
         );

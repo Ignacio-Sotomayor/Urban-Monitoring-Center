@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class SecurityNoticeDAO {
 
@@ -49,6 +50,55 @@ public class SecurityNoticeDAO {
                 notices.add(notice);
             }
         }
+        return notices;
+    }
+
+    public Set<SecurityNotice> getAllSecurityNoticesBetweenDates(Timestamp from, Timestamp to) throws SQLException {
+        String sql = "SELECT SecurityNotice_ID, SecurityNotice_Description, SecurityNotice_Latitude, SecurityNotice_Longitude, SecurityNotice_Address, SecurityNotice_DateTime, Issuer_DeviceUUID FROM SecurityNotices WHERE SecurityNotice_DateTime BETWEEN ? AND ? ORDER BY SecurityNotice_DateTime ASC ";
+
+        HashSet<SecurityNotice> notices = new HashSet<>();
+        SecurityNoticeDetailsDAO detailsDao = new SecurityNoticeDetailsDAO();
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setTimestamp(1, from);
+            pstmt.setTimestamp(2, to);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("SecurityNotice_ID");
+                String description = rs.getString("SecurityNotice_Description");
+                String address = rs.getString("SecurityNotice_Address");
+                Timestamp dateTime = rs.getTimestamp("SecurityNotice_DateTime");
+                java.math.BigDecimal latitude = rs.getBigDecimal("SecurityNotice_Latitude");
+                java.math.BigDecimal longitude = rs.getBigDecimal("SecurityNotice_Longitude");
+                String deviceUUIDStr = rs.getString("Issuer_DeviceUUID");
+
+                UUID deviceUUID = UUID.fromString(deviceUUIDStr);
+                Device device = UrbanMonitoringCenter.getUrbanMonitoringCenter()
+                        .getDevices()
+                        .get(deviceUUID);
+
+                if (device == null) continue;
+
+                Location location = new Location(latitude, longitude);
+
+                EventGeolocation eventGeo = new EventGeolocation(
+                        dateTime.toLocalDateTime(),
+                        address,
+                        location,
+                        device
+                );
+
+                Set<Service> services = detailsDao.getAllServicesForSecurityNotice(id);
+
+                SecurityNotice notice = new SecurityNotice(description, eventGeo, services);
+                notices.add(notice);
+            }
+        }
+
         return notices;
     }
 

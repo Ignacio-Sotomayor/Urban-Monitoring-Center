@@ -37,7 +37,7 @@ CREATE TABLE Fines(
     Fine_Longitude DECIMAL(9,6) CHECK (Longitude >= -180 AND Longitude <= 180) NOT NULL,
     Fine_Address VARCHAR(100) NOT NULL,
     Fine_DateTime TIMESTAMP NOT NULL,
-    Issuer_DeviceUUID VARCHAR(34) NOT NULL,
+    Issuer_DeviceUUID VARCHAR(36) NOT NULL,
     Automobile_ID INTEGER REFERENCES Automobiles(Automobile_ID) ON DELETE NO ACTION ON UPDATE CASCADE,
     InfractionType_ID INTEGER REFERENCES InfractionTypes(InfractionType_ID) ON DELETE NO ACTION ON UPDATE CASCADE,
     SpeedLimit INTEGER,
