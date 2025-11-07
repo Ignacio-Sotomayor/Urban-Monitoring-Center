@@ -5,30 +5,30 @@ import com.model.Automobile.Automobile;
 import java.util.Set;
 
 public class ExcessiveSpeedFine extends Fine {
-    private final int automobileSpeed;
-    private final int speedLimit;
+    private final double automobileSpeed;
+    private final double speedLimit;
 
-    public ExcessiveSpeedFine(Integer FineID, EventGeolocation eventGeolocation, InfractionType infractionType, Automobile automobile, Set<Photo> photoSet, int speedLimit, int automobileSpeed) {
+    public ExcessiveSpeedFine(Integer FineID, EventGeolocation eventGeolocation, InfractionType infractionType, Automobile automobile, Set<Photo> photoSet, double speedLimit, double automobileSpeed) {
         super(FineID, eventGeolocation, infractionType, automobile, photoSet);
-        this.automobileSpeed = automobileSpeed;
         this.speedLimit = speedLimit;
+        this.automobileSpeed = automobileSpeed;
     }
-    public ExcessiveSpeedFine(EventGeolocation eventGeolocation, InfractionType infractionType, Automobile automobile, int speedLimit, int automobileSpeed) {
+    public ExcessiveSpeedFine(EventGeolocation eventGeolocation, InfractionType infractionType, Automobile automobile, double speedLimit, double automobileSpeed) {
         super( eventGeolocation, infractionType, automobile);
-        this.automobileSpeed = automobileSpeed;
         this.speedLimit = speedLimit;
+        this.automobileSpeed = automobileSpeed;
     }
 
     //getters
-    public int getAutomobileSpeed() {
+    public double getAutomobileSpeed() {
         return automobileSpeed;
     }
-    public int getSpeedLimit() {
+    public double getSpeedLimit() {
         return speedLimit;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", ExcessiveSpeedFine [automobileSpeed=" + automobileSpeed + ", speedLimit=" + speedLimit + "]";
+        return super.toString() + "automobileSpeed =" + automobileSpeed + ", speedLimit =" + speedLimit;
     }
 }

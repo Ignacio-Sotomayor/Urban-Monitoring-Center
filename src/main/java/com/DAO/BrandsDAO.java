@@ -27,7 +27,11 @@ public class BrandsDAO {
         ){
             pstmt.setString(1, Name);
             ResultSet rs = pstmt.executeQuery();
-            Brand_ID = rs.getInt("Brand_ID");
+            if(rs.next())
+                Brand_ID = rs.getInt("Brand_ID");
+            else
+                throw new SQLException("No existe la marca: " + Name);
+
         }
         return Brand_ID;
     }

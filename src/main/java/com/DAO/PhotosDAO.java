@@ -19,7 +19,11 @@ public class PhotosDAO {
         ){
             pstmt.setInt(1,PhotoID);
             ResultSet rs = pstmt.executeQuery();
-            path = rs.getString(1);
+            if(rs.next())
+                path = rs.getString(1);
+            else
+                throw new SQLException("No existe la foto con ID: " + PhotoID);
+
         }
         return  new Photo(path);
     }

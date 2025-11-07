@@ -39,10 +39,14 @@ public class AutomobileDAO {
         ){
             pstmt.setInt(1,AutomobileID);
             ResultSet rs = pstmt.executeQuery();
+            if(!rs.next()) {
+                throw new SQLException("No existe el automóvil con ID " + AutomobileID);
+            }
             licensePlate = rs.getString("license_Plate");
             Year = rs.getInt("Automobile_Year");
             ModelID = rs.getInt("Model_ID");
             OwnerID = rs.getInt("Owner_ID");
+
         }
         OwnersDAO ownerDao= new OwnersDAO();
         ModelsDAO modelDao = new ModelsDAO();

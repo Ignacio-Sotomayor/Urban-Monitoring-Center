@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
 public abstract class FineIssuerDevice extends Device{
     @Serial
     private static final long serialVersionUID = 7716519194965191290L;
-    private InfractionType emitedInfractionType;
-    private transient final RegistryNotifier notifier;
+    private transient  InfractionType emitedInfractionType;
+    protected transient final RegistryNotifier notifier;
 
     public FineIssuerDevice(String address, Location location,boolean state, InfractionType emitedInfractionType) {
         super(address, location, state);
@@ -33,6 +33,12 @@ public abstract class FineIssuerDevice extends Device{
     public InfractionType getEmitedInfractionType() {
         return emitedInfractionType;
     }
+
+    public void setEmitedInfractionType(InfractionType infractionType) {
+        this.emitedInfractionType = infractionType;
+    }
+
+    public abstract String getDefaultInfractionTypeName();
 
     public void issueFine(Automobile a){
         MotorVehicleRegistry MVR = MotorVehicleRegistry.getMotorVehicleRegistry();

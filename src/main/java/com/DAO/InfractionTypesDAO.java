@@ -14,27 +14,33 @@ import java.util.List;
 public class InfractionTypesDAO {
     public InfractionType getInfractionTypeByID(Integer InfractionTypeID) throws SQLException {
         String sql = "SELECT InfractionType_Name, InfractionType_Description, InfractionType_Scoring, InfractionType_Amount, surchangePer10PercentExcess FROM InfractionTypes WHERE InfractionType_ID = ?";
-        String InfractionTypeName, InfractionTypeDesc;
-        int InfractionTypeScoring;
-        BigDecimal InfractionTypeAmount;
-        BigDecimal surchangePer10PercentExcess;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-        try(Connection conn = DBConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-        ){
-            pstmt.setInt(1,InfractionTypeID);
-            ResultSet rs = pstmt.executeQuery();
-            InfractionTypeName = rs.getString("InfractionType_Name");
-            InfractionTypeDesc = rs.getString("InfractionType_Description");
-            InfractionTypeScoring = rs.getInt("InfractionType_Scoring");
-            InfractionTypeAmount = rs.getBigDecimal("InfractionType_Amount");
-            surchangePer10PercentExcess = rs.getBigDecimal("surchangePer10PercentExcess");
+            pstmt.setInt(1, InfractionTypeID);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("No se encontró InfractionType con ID: " + InfractionTypeID);
+                }
+
+                String name = rs.getString("InfractionType_Name");
+                String desc = rs.getString("InfractionType_Description");
+                int scoring = rs.getInt("InfractionType_Scoring");
+                BigDecimal amount = rs.getBigDecimal("InfractionType_Amount");
+                BigDecimal surcharge = rs.getBigDecimal("surchangePer10PercentExcess");
+
+                if (surcharge != null) {
+                    return new ExcessiveSpeed(desc, amount, scoring, surcharge);
+                } else {
+                    return new InfractionType(name, desc, amount, scoring);
+                }
+            }
         }
-        if(surchangePer10PercentExcess!=null)
-            return new ExcessiveSpeed(InfractionTypeDesc,InfractionTypeAmount,InfractionTypeScoring,surchangePer10PercentExcess);
-        else
-            return new InfractionType(InfractionTypeName,InfractionTypeDesc,InfractionTypeAmount,InfractionTypeScoring);
     }
+
+
+
     public Integer getInfractionTypeIdByName(String name) throws SQLException{
         String sql = "SELECT InfractionType_ID FROM InfractionTypes WHERE InfractionType_Name = ?";
         Integer id;
@@ -44,7 +50,11 @@ public class InfractionTypesDAO {
         ){
             pstmt.setString(1, name);
             ResultSet rs = pstmt.executeQuery();
-            id = rs.getInt("InfractionType_ID");
+            if(rs.next()) {
+                id = rs.getInt("InfractionType_ID");
+            } else {
+                throw new SQLException("No se encontró InfractionType con nombre: " + name);
+            }
         }
         return id;
     }

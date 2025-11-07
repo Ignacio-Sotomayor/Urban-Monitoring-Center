@@ -32,7 +32,7 @@ public class Main {
         UMC.startRandomFineSimulation();
         // Mantener el programa vivo 30 segundos:
         try {
-            Thread.sleep(30000);
+            Thread.sleep(25000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

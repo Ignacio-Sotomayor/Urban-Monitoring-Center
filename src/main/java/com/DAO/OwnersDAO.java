@@ -38,14 +38,17 @@ public class OwnersDAO {
         }
     }
     public Integer getOwnerIdByLegalID(String legalID)throws SQLException{
-        String sql = "SELECT Owner_ID FORM OWNERS WHERE Owner_LegalID = ?";
+        String sql = "SELECT Owner_ID FROM OWNERS WHERE Owner_LegalID = ?";
         Integer response;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
         ){
             pstmt.setString(1,legalID);
             ResultSet rs = pstmt.executeQuery();
-            response = Integer.valueOf(rs.getInt("Owner_ID"));
+            if(rs.next())
+                response = rs.getInt("Owner_ID");
+            else
+                throw new SQLException("No existe el dueño con DNI: " + legalID);
         }
         return response;
     }

@@ -30,7 +30,11 @@ public class ModelsDAO {
         ){
             pstmt.setString(1,Name);
             ResultSet rs = pstmt.executeQuery();
-            modelId = rs.getInt("Models_ID");
+            if(rs.next())
+                modelId = rs.getInt("Models_ID");
+            else
+                throw new SQLException("No existe el modelo: " + Name);
+
         }
         return modelId;
     }
