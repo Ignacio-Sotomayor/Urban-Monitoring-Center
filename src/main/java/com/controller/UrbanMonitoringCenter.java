@@ -2,12 +2,6 @@ package com.controller;
 import com.DAO.FineDAO;
 import com.DAO.InfractionTypesDAO;
 import com.DAO.OwnersDAO;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.Barcode128;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.model.Automobile.Automobile;
 import com.model.Automobile.MotorVehicleRegistry;
 import com.model.Devices.*;
@@ -15,18 +9,12 @@ import com.model.FailureRecord;
 import com.model.Fines.Fine;
 import com.model.Fines.InfractionType;
 import com.model.SecurityNotice;
-
-
 import java.io.*;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -83,9 +71,11 @@ public class UrbanMonitoringCenter {
     }
 
     public Device getRandomDevice(){
-        Random random = new Random();
-        return devices.get(random.nextInt(devices.size()));
+        if (devices.isEmpty()) return null;
+        List<Device> deviceList = new ArrayList<>(devices.values());
+        return deviceList.get(new Random().nextInt(deviceList.size()));
     }
+
     public FineIssuerDevice getRandomFineIssuerDevice() {
         List<FineIssuerDevice> fineIssuers = devices.values().stream()
                 .filter(d -> d instanceof FineIssuerDevice)
@@ -97,13 +87,17 @@ public class UrbanMonitoringCenter {
         }
 
         Random random = new Random();
-        return fineIssuers.get(random.nextInt(fineIssuers.size()));
+        FineIssuerDevice d = fineIssuers.get(random.nextInt(fineIssuers.size()));
+        System.out.println(d.getDeviceTypeName());
+        return d;
     }
+
     public void issuedDevices(Device d){
         if (d != null && d.getState()) {
             d.setState(false);
             failureRecords.add(new FailureRecord(d, "NO OPERATIVO"));
         }
+        UrbanMonitoringCenter.getUrbanMonitoringCenter().saveDevices("devices.ser");
     }
     public void repairDevices(Device d){
         if (d == null) return;
@@ -118,7 +112,10 @@ public class UrbanMonitoringCenter {
         } else {
             this.fatalErrorDevices.remove(d.getId());
         }
+        UrbanMonitoringCenter.getUrbanMonitoringCenter().saveDevices("devices.ser");
+
     }
+
     public Device getDeviceByAddress(String address) throws SQLException {
         for (Device device : devices.values()) {
             if (device.getAddress().equalsIgnoreCase(address)) {
@@ -132,43 +129,43 @@ public class UrbanMonitoringCenter {
         TrafficLightController tf;
 
         //TrafficLightControllers in Av Independencia
-        tf = new TrafficLightController("Av. Independencia 2500",new Location(BigDecimal.valueOf(-38.002863),BigDecimal.valueOf(-57.558199)),true, new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Gascon",false));
+        tf = new TrafficLightController("Av. Independencia 2500",new Location(BigDecimal.valueOf(-38.002863),BigDecimal.valueOf(-57.558199)),true, new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Gascon",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 2400",new Location(BigDecimal.valueOf(-38.002053),BigDecimal.valueOf(-57.557535)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Falucho",false));
+        tf = new TrafficLightController("Av. Independencia 2400",new Location(BigDecimal.valueOf(-38.002053),BigDecimal.valueOf(-57.557535)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Falucho",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 2300",new Location(BigDecimal.valueOf(-38.001261),BigDecimal.valueOf(-57.556904)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Almirante Brown",false));
+        tf = new TrafficLightController("Av. Independencia 2300",new Location(BigDecimal.valueOf(-38.001261),BigDecimal.valueOf(-57.556904)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Almirante Brown",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia, Av. Colon",new Location(BigDecimal.valueOf(-38.000394),BigDecimal.valueOf(-57.556213)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Av. Colon",false));
+        tf = new TrafficLightController("Av. Independencia, Av. Colon",new Location(BigDecimal.valueOf(-38.000394),BigDecimal.valueOf(-57.556213)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Av. Colon",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 2100",new Location(BigDecimal.valueOf(-37.999542),BigDecimal.valueOf(-57.555559)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Bolivar",false));
+        tf = new TrafficLightController("Av. Independencia 2100",new Location(BigDecimal.valueOf(-37.999542),BigDecimal.valueOf(-57.555559)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Bolivar",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 2000",new Location(BigDecimal.valueOf(-37.998758),BigDecimal.valueOf(-57.554895)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Moreno",false));
+        tf = new TrafficLightController("Av. Independencia 2000",new Location(BigDecimal.valueOf(-37.998758),BigDecimal.valueOf(-57.554895)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Moreno",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 1900",new Location(BigDecimal.valueOf(-37.997960),BigDecimal.valueOf(-57.554263)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Belgrano",false));
+        tf = new TrafficLightController("Av. Independencia 1900",new Location(BigDecimal.valueOf(-37.997960),BigDecimal.valueOf(-57.554263)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Belgrano",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 1800",new Location(BigDecimal.valueOf(-37.997194),BigDecimal.valueOf(-57.553623)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Rivadavia",false));
+        tf = new TrafficLightController("Av. Independencia 1800",new Location(BigDecimal.valueOf(-37.997194),BigDecimal.valueOf(-57.553623)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Rivadavia",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 1700",new Location(BigDecimal.valueOf(-37.996395),BigDecimal.valueOf(-57.552932)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "San Martin",false));
+        tf = new TrafficLightController("Av. Independencia 1700",new Location(BigDecimal.valueOf(-37.996395),BigDecimal.valueOf(-57.552932)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "San Martin",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia, Av. Pedro Luro",new Location(BigDecimal.valueOf(-37.995545),BigDecimal.valueOf(-57.552259)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "Av. Pedro Luro",false));
+        tf = new TrafficLightController("Av. Independencia, Av. Pedro Luro",new Location(BigDecimal.valueOf(-37.995545),BigDecimal.valueOf(-57.552259)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "Av. Pedro Luro",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 1500",new Location(BigDecimal.valueOf(-37.994681),BigDecimal.valueOf(-57.551600)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "25 de Mayo",false));
+        tf = new TrafficLightController("Av. Independencia 1500",new Location(BigDecimal.valueOf(-37.994681),BigDecimal.valueOf(-57.551600)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "25 de Mayo",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 1400",new Location(BigDecimal.valueOf(-37.993883),BigDecimal.valueOf(-57.550930)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "9 de Julio",false));
+        tf = new TrafficLightController("Av. Independencia 1400",new Location(BigDecimal.valueOf(-37.993883),BigDecimal.valueOf(-57.550930)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "9 de Julio",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 1300",new Location(BigDecimal.valueOf(-37.993094),BigDecimal.valueOf(-57.550322)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "3 de Febrero",false));
+        tf = new TrafficLightController("Av. Independencia 1300",new Location(BigDecimal.valueOf(-37.993094),BigDecimal.valueOf(-57.550322)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "3 de Febrero",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Av. Independencia 1200",new Location(BigDecimal.valueOf(-37.992316),BigDecimal.valueOf(-57.549679)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true), new TrafficLight("Av. Independencia", "11 de Septiembre",false));
+        tf = new TrafficLightController("Av. Independencia 1200",new Location(BigDecimal.valueOf(-37.992316),BigDecimal.valueOf(-57.549679)),true,new TrafficLight("Av. Independencia", "Av. Independencia", true, TrafficLightState.GREEN), new TrafficLight("Av. Independencia", "11 de Septiembre",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
 
         //TrafficLightControllers in Rivadavia street
-        tf = new TrafficLightController("Rivadavia 2900",new Location(BigDecimal.valueOf(-37.998781),BigDecimal.valueOf(-57.550557)),true,new TrafficLight("Rivadavia", "Rivadavia", true), new TrafficLight("Rivadavia", "Hipolito Yrigoyen",false));
+        tf = new TrafficLightController("Rivadavia 2900",new Location(BigDecimal.valueOf(-37.998781),BigDecimal.valueOf(-57.550557)),true,new TrafficLight("Rivadavia", "Rivadavia", true, TrafficLightState.GREEN), new TrafficLight("Rivadavia", "Hipolito Yrigoyen",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Rivadavia 2800",new Location(BigDecimal.valueOf(-37.999231),BigDecimal.valueOf(-57.549566)),true,new TrafficLight("Rivadavia", "Rivadavia", true), new TrafficLight("Rivadavia", "Bartolome Mitre",false));
+        tf = new TrafficLightController("Rivadavia 2800",new Location(BigDecimal.valueOf(-37.999231),BigDecimal.valueOf(-57.549566)),true,new TrafficLight("Rivadavia", "Rivadavia", true, TrafficLightState.GREEN), new TrafficLight("Rivadavia", "Bartolome Mitre",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Rivadavia 2700",new Location(BigDecimal.valueOf(-37.999741),BigDecimal.valueOf(-57.548524)),true,new TrafficLight("Rivadavia", "Rivadavia", true), new TrafficLight("Rivadavia", "San Luis",false));
+        tf = new TrafficLightController("Rivadavia 2700",new Location(BigDecimal.valueOf(-37.999741),BigDecimal.valueOf(-57.548524)),true,new TrafficLight("Rivadavia", "Rivadavia", true, TrafficLightState.GREEN), new TrafficLight("Rivadavia", "San Luis",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
-        tf = new TrafficLightController("Rivadavia 2600",new Location(BigDecimal.valueOf(-38.000255),BigDecimal.valueOf(-57.547554)),true,new TrafficLight("Rivadavia", "Rivadavia", true), new TrafficLight("Rivadavia", "Cordoba",false));
+        tf = new TrafficLightController("Rivadavia 2600",new Location(BigDecimal.valueOf(-38.000255),BigDecimal.valueOf(-57.547554)),true,new TrafficLight("Rivadavia", "Rivadavia", true, TrafficLightState.GREEN), new TrafficLight("Rivadavia", "Cordoba",false, TrafficLightState.RED));
         UMC.devices.put(tf.getId(),tf);
 
         Radar rd;
@@ -215,6 +212,13 @@ public class UrbanMonitoringCenter {
         try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))){
             HashMap<UUID,Device> loadedDevices = (HashMap<UUID, Device>) ois.readObject();
             this.devices = loadedDevices;
+            List<FineIssuerDevice> fineIssuers = devices.values().stream()
+                    .filter(d -> d instanceof FineIssuerDevice)
+                    .map(d -> (FineIssuerDevice) d)
+                    .toList();
+            for(FineIssuerDevice f: fineIssuers){
+                f.setEmitedInfractionType();
+            }
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -264,7 +268,7 @@ public class UrbanMonitoringCenter {
                 try {
                     simulateRandomFineOnce();
                     int delay = random.nextInt(MAX_FINE_INTERVAL - MIN_FINE_INTERVAL + 1) + MIN_FINE_INTERVAL;
-                    Thread.sleep(delay * 1000);
+                    Thread.sleep(delay * 500);
 
                 } catch (InterruptedException e) {
                     break;
@@ -279,6 +283,7 @@ public class UrbanMonitoringCenter {
         fineThread.setName("RandomFineGenerator");
         fineThread.start();
     }
+
     public void stopRandomFineSimulation() {
         synchronized (fineSimulationLock) {
             running = false;
@@ -294,7 +299,7 @@ public class UrbanMonitoringCenter {
         FineIssuerDevice device;
         try {
             device = getRandomFineIssuerDevice();
-            System.out.println(device.getEmitedInfractionType().getName());
+            System.out.println(device.getDeviceTypeName());
         } catch (IllegalStateException e) {
             System.err.println("No hay dispositivos emisores disponibles.");
             return;
@@ -336,12 +341,12 @@ public class UrbanMonitoringCenter {
             while (isRunning) {
                 try {
                     int delay = random.nextInt(MAX_FAILURE_INTERVAL - MIN_FAILURE_INTERVAL + 1) + MIN_FAILURE_INTERVAL;
-                    Thread.sleep(delay * 1000);
+                    Thread.sleep(delay * 500);
 
                     Device deviceToFail = getRandomDevice();
                     if (deviceToFail != null) {
                         System.out.println("SIMULATING FAILURE for device: " + deviceToFail.getAddress());
-                        if (deviceToFail.getDeviceTypeName() == "TrafficLightController" && random.nextDouble() < FATAL_ERROR_PROBABILITY) {
+                        if (Objects.equals(deviceToFail.getDeviceTypeName(), "TrafficLightController") && random.nextDouble() < FATAL_ERROR_PROBABILITY) {
                             setFatalError(deviceToFail);
                         } else {
                             issuedDevices(deviceToFail);
@@ -423,72 +428,7 @@ public class UrbanMonitoringCenter {
                 failureRecords.add(new FailureRecord(device, "NO OPERATIVO"));
             }
         }
-    }
-
-    private String generateBarcode(int fineNumber, BigDecimal amount) {
-        String finePart = String.format("%06d", fineNumber);
-
-        BigDecimal scaled = amount.setScale(2, BigDecimal.ROUND_HALF_UP);
-        String amountStr = scaled.toPlainString().replace(".", "");
-        amountStr = String.format("%012d", Long.parseLong(amountStr));
-
-        return finePart + amountStr;
-    }
-    public void generateFinePDF(Fine fine, int fineNumber) {
-        Path outputDir = Paths.get("fines");
-        try {
-            if (!Files.exists(outputDir)) Files.createDirectories(outputDir);
-        } catch (IOException e) {
-            System.err.println("No se pudo crear carpeta fines: " + e.getMessage());
-            return;
-        }
-
-        String filename = String.format("Multa_%06d.pdf", fineNumber);
-        Path outputFile = outputDir.resolve(filename);
-
-        Document document = new Document();
-        try {
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outputFile.toFile()));
-            document.open();
-
-            Paragraph header = new Paragraph("Dirección de Tránsito\n");
-            header.setAlignment(Element.ALIGN_CENTER);
-            document.add(header);
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Número de multa: " + String.format("%06d", fineNumber)));
-            document.add(new Paragraph("Fecha de emisión: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
-            document.add(new Paragraph(" "));
-
-            document.add(new Paragraph("Titular: " + fine.getAutomobile().getOwner().getFullName()));
-            document.add(new Paragraph("DNI: " + fine.getAutomobile().getOwner().getLegalIid()));
-            document.add(new Paragraph("Domicilio: " + fine.getAutomobile().getOwner().getAddress()));
-            document.add(new Paragraph("Automóvil: " + fine.getAutomobile().getBrand() + " " + fine.getAutomobile().getModel()));
-            document.add(new Paragraph("Patente: " + fine.getAutomobile().getLicensePlate()));
-            document.add(new Paragraph(" "));
-
-            document.add(new Paragraph("Tipo de infracción: " + fine.getInfractionType().getDescription()));
-            document.add(new Paragraph("Lugar: " + fine.getEventGeolocation().getAddress()));
-            document.add(new Paragraph("Fecha/Hora: " + fine.getEventGeolocation().getDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
-            document.add(new Paragraph("Valor a pagar: $" + fine.getAmount()));
-            document.add(new Paragraph("Puntos a reducir: "));
-            document.add(new Paragraph(" "));
-
-            String barcodeValue = generateBarcode(fineNumber, fine.getAmount());
-            document.add(new Paragraph("Código de barras: " + barcodeValue));
-
-            Barcode128 barcode = new Barcode128();
-            barcode.setCode(barcodeValue);
-            Image barcodeImage = barcode.createImageWithBarcode(writer.getDirectContent(), null, null);
-            barcodeImage.scalePercent(150);
-            barcodeImage.setAlignment(Element.ALIGN_CENTER);
-            document.add(barcodeImage);
-
-            document.close();
-            writer.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        UrbanMonitoringCenter.getUrbanMonitoringCenter().saveDevices("devices.ser");
     }
 
     public void startSimulations() {

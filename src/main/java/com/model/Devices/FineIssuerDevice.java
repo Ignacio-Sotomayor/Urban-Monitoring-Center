@@ -9,8 +9,7 @@ import com.model.Fines.EventGeolocation;
 import com.model.Fines.Fine;
 import com.model.Fines.InfractionType;
 import com.view.Reports.FinesWindow;
-import com.view.FinesWindow;
-import com.view.RegistryNotifier;
+import com.controller.RegistryNotifier;
 
 import java.io.Serial;
 import java.sql.SQLException;
@@ -28,9 +27,12 @@ public abstract class FineIssuerDevice extends Device{
         super(address, location, state);
 
         this.emitedInfractionType = emitedInfractionType;
-        this.notifier = FinesWindow.getNotifier();
+        this.notifier = RegistryNotifier.getNotifier();
     }
 
+    public abstract void setEmitedInfractionType();
+
+    public void setEmitedInfractionType(InfractionType infractionType){ this.emitedInfractionType = infractionType;}
     public InfractionType getEmitedInfractionType() {
         return emitedInfractionType;
     }
@@ -56,10 +58,7 @@ public abstract class FineIssuerDevice extends Device{
                     automobileID);
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
-            notifier.notifyObservers(fine);
         }
-
+        System.out.println("Multa");
     }
-
 }

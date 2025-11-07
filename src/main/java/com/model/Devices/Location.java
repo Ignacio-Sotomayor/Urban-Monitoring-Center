@@ -24,8 +24,9 @@ public class Location implements Serializable {
     }
 
     public String toString(){
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder("  ");
         builder.append(latitude);
+        builder.append("   ");
         builder.append(longitude);
         return builder.toString();
     }

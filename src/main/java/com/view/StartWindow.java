@@ -44,6 +44,7 @@ public class StartWindow extends JFrame {
         add(lastSaveLoadButton);
         add(baseBrandStartButton);
     }
+
     public static void main(String[] args){
         UrbanMonitoringCenter.getUrbanMonitoringCenter().startSimulations();
 

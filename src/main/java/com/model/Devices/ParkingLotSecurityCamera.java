@@ -1,6 +1,7 @@
 package com.model.Devices;
 
 import com.controller.UrbanMonitoringCenter;
+import com.model.Fines.InfractionType;
 
 import java.io.Serial;
 import java.net.URL;
@@ -14,6 +15,10 @@ public class ParkingLotSecurityCamera extends FineIssuerDevice {
     public ParkingLotSecurityCamera( String address, Location location,boolean state, Duration toleranceTime) {
         super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("ParkingOverTime"));
         this.toleranceTime = toleranceTime;
+    }
+
+    public void setEmitedInfractionType(){
+        super.setEmitedInfractionType(UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("ParkingOverTime"));
     }
 
     @Override

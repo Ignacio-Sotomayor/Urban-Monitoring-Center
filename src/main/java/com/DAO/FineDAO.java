@@ -338,30 +338,31 @@ public class FineDAO {
 
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
-        ){
-            pstmt.setInt(3,N);
+        ) {
+            pstmt.setInt(1, N);
 
             rs = pstmt.executeQuery();
-        }
-        if(rs.next()){
-            InfractionTypesDAO infractionDao = new InfractionTypesDAO();
-            AutomobileDAO automobileDao = new AutomobileDAO();
-            PhotosDAO photoDao = new PhotosDAO();
-            while (rs.next()) {
-                FineID = rs.getInt("Fine_ID");
-                timestamp = rs.getTimestamp("Fine_DateTime");
-                address = rs.getString("Fine_Address");
-                latitude = rs.getBigDecimal("Fine_Latitude");
-                longitude = rs.getBigDecimal("Fine_Longitude");
-                uuid= rs.getString("Issuer_DeviceUUID");
-                AutomobileID = rs.getInt("Automobile_ID");
-                InfractionTypeID = rs.getInt("InfractionType_ID");
-                if(InfractionTypeID!=1) {
-                    fines.add(new Fine(FineID, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(InfractionTypeID), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID)));
 
-                } else
-                    fines.add(new ExcessiveSpeedFine(FineID, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude),UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid)) ), infractionDao.getInfractionTypeByID(1), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID),rs.getInt("SpeedLimit"), rs.getInt("AutomobileSpeed")));
+            if (rs.next()) {
+                InfractionTypesDAO infractionDao = new InfractionTypesDAO();
+                AutomobileDAO automobileDao = new AutomobileDAO();
+                PhotosDAO photoDao = new PhotosDAO();
+                while (rs.next()) {
+                    FineID = rs.getInt("Fine_ID");
+                    timestamp = rs.getTimestamp("Fine_DateTime");
+                    address = rs.getString("Fine_Address");
+                    latitude = rs.getBigDecimal("Fine_Latitude");
+                    longitude = rs.getBigDecimal("Fine_Longitude");
+                    uuid = rs.getString("Issuer_DeviceUUID");
+                    AutomobileID = rs.getInt("Automobile_ID");
+                    InfractionTypeID = rs.getInt("InfractionType_ID");
+                    if (InfractionTypeID != 1) {
+                        fines.add(new Fine(FineID, new EventGeolocation(timestamp.toLocalDateTime(), address, new Location(latitude, longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(InfractionTypeID), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID)));
 
+                    } else
+                        fines.add(new ExcessiveSpeedFine(FineID, new EventGeolocation(timestamp.toLocalDateTime(), address, new Location(latitude, longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(1), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID), rs.getInt("SpeedLimit"), rs.getInt("AutomobileSpeed")));
+
+                }
             }
         }
         return fines.iterator();

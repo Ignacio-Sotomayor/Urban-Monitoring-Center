@@ -17,6 +17,14 @@ public class TrafficLight implements Serializable {
     private TrafficLightState currentState;
     private boolean operative;
 
+    public TrafficLight(String street, String orientation, boolean isMain, TrafficLightState currentState) {
+        this.street = street;
+        this.orientation = orientation;
+        this.isMain = isMain;
+        this.currentState = currentState;
+        this.operative = true;
+    }
+
     public TrafficLight(String street, String orientation, boolean isMain) {
         this.street = street;
         this.orientation = orientation;

@@ -2,6 +2,7 @@ package com.model.Devices;
 
 import com.controller.UrbanMonitoringCenter;
 import com.model.DisconnectedTrafficLightException;
+import com.model.Fines.InfractionType;
 import com.model.UnrepairableDeviceException;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,6 +94,10 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
     public void setInitialDelay(long initialDelay) { this.initialDelay = initialDelay; }
     public void setForceIntermittent(boolean forceIntermittent) { this.forceIntermittent = forceIntermittent; }
 
+    public void setEmitedInfractionType(){
+        super.setEmitedInfractionType(UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+    }
+
     public void changeTrafficLightsIntermittent(){
         intersectionLights.get(0).changeState(TrafficLightState.INTERMITTENT);
         intersectionLights.get(1).changeState(TrafficLightState.INTERMITTENT);
@@ -181,12 +186,8 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         try {
             Thread.sleep(initialDelay);
 
-            // Initial state (Step 1)
-            main.changeState(TrafficLightState.GREEN);
-            secondary.changeState(TrafficLightState.RED);
-            // Removed checkFaults() call
-
             while (true) {
+
                 // If controller is in fatal error, stop its cycle
                 if (UrbanMonitoringCenter.getUrbanMonitoringCenter().isFatalError(this)) {
                     Thread.sleep(5000); // Wait if in fatal error
