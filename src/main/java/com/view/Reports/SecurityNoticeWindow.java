@@ -119,11 +119,6 @@ public class SecurityNoticeWindow extends JFrame {
             summary.append(String.format("<br><b>Total Notices:</b> %s</center></html>", total));
             summaryLabel.setText(summary.toString());
 
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Error retrieving security notices: " + ex.getMessage(),
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                     "Unexpected error: " + ex.getMessage(),

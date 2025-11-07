@@ -1,95 +1,151 @@
 # 🏙️ Urban Monitoring Center – System Architecture
 
 ## 1. Introduction
-This document outlines the high-level architecture of the Urban Monitoring Center simulation. It describes the system’s key components, their responsibilities, and how they interact — without delving into class-level details, which are covered in the separate data dictionary.
-
----
+The Urban Monitoring Center is a Java-based system that simulates city-wide traffic and security monitoring through a distributed network of devices and centralized management.
 
 ## 2. System Overview
 
-The system is designed to monitor and enforce traffic regulations, coordinate emergency responses, and manage data from a distributed network of urban devices.
+### Core Functionality
+- Traffic monitoring and violation detection
+- Security camera surveillance
+- Device status management
+- Fine processing and documentation
+- Geographic visualization of city devices
 
-Key capabilities include:
-- Monitoring intersections, devices, and vehicles
-- Issuing fines for detected violations
-- Dispatching emergency services when required
-- Simulating real-time urban dynamics (e.g., traffic cycles, security events)
+## 3. Component Architecture
 
----
+### 🎮 Controller Layer
+```markdown
+UrbanMonitoringCenter:
+- Central system controller (Singleton)
+- Manages device network
+- Coordinates system responses
+- Processes security notices
 
-## 3. Components & Responsibilities
+RegistryNotifier:
+- Handles system-wide notifications
+- Bridges devices and registry
+- Manages fine processing
+```
 
-### 🚦 UrbanMonitoringCenter (Singleton)
-- Acts as the central hub
-- Manages devices, service definitions, and security notices
-- Interfaces with the vehicle registry for fine linkage
+### 💾 Data Access Layer
+```markdown
+DBConnection:
+- PostgreSQL connection management
+- Connection pooling
+- Query execution
 
-### 📡 Devices
-- Physical or simulated entities deployed across the city
-- Types include traffic lights, speed radars, photo-fine cameras, and security monitors
-- Report events and maintain operational state
+Core DAOs:
+- AutomobileDAO: Vehicle registration
+- BrandsDAO: Manufacturer data
+- ModelsDAO: Vehicle models
+- OwnersDAO: Owner records
+- FineDAO: Violation management
+- SecurityNoticeDAO: Incident tracking
+- ServiceDAO: Maintenance records
+```
 
-### 🧾 Fines Module
-- Manages creation and tracking of traffic violations
-- Interfaces with vehicle data and enforcement policies
+### 📦 Model Layer
+```markdown
+Automobile Package:
+- Vehicle registration (Automobile)
+- Brand management
+- Model tracking
+- Owner information
+- Registry operations (MotorVehicleRegistry)
 
-### 🚗 Automobile Registry
-- Maintains vehicle and owner information
-- Associates fines with responsible vehicles
-- Supports brand/model taxonomy
+Devices Package:
+- Abstract Device base class
+- FineIssuerDevice interface
+- Specialized devices:
+  * TrafficLight
+  * Radar
+  * SecurityCamera
+  * ParkingLotSecurityCamera
+- Location tracking
+- State management
 
-### 🚨 Emergency Services
-- Enumerates available response units (Police, Firefighters, Medical, Civil Defense)
-- Triggered by operator input or system alerts
+Fines Package:
+- Fine processing
+- Violation types
+- Photo evidence
+- Geolocation tracking
+```
 
----
+### 🖥️ View Layer
+```markdown
+Main Windows:
+- StartWindow: Entry point
+- MenuWindow: Navigation
+- MapWindow: Geographic interface
+- CamerasWindow: Surveillance
 
-## 4. Interaction Flow
+Registry Management:
+- InsertWindow
+- ViewWindow
+- ModelsForm
+- ModelsTable
 
-1. A device detects a relevant event (e.g., speed violation, red light breach, emergency situation)
-2. The UrbanMonitoringCenter validates the event and either:
-   - Issues a fine and links it to the automobile
-   - Creates a security notice and contacts relevant services
-3. Information is persisted and may later be used to generate reports
+Reporting:
+- FinesWindow
+- DeviceEventsWindow
+- SecurityNoticeWindow
+- AutomobileFinesWindow
+```
 
----
+## 4. Resource Organization
+```markdown
+Static Resources:
+- map.html/map.js: Mapping interface
+- Icons/: System graphics
+- videos/: Surveillance recordings
+```
 
-## 5. Technology Stack
+## 5. Key System Interactions
 
-- **Language:** Java
-- **Architecture:** Object-oriented with extensible module design
-- **Patterns:**
-  - Singleton (`UrbanMonitoringCenter`, `MotorVehicleRegistry`)
-  - Inheritance (`Device`, `Fine`, `InfractionType`)
-  - Interfaces (`Runnable`, `FineIssuer`)
-- **Data Management:** In-memory collections (with potential for database integration)
-- **Concurrency:** Multi-threaded simulation (e.g., traffic light cycles)
+### Device Management Flow
+1. Devices report status to UrbanMonitoringCenter
+2. Controller processes device state changes
+3. View layer updates display
+4. Failures trigger maintenance records
 
----
+### Fine Processing Flow
+1. FineIssuerDevices detect violations
+2. RegistryNotifier processes notifications
+3. FineDAO records violation
+4. MotorVehicleRegistry updates records
+5. Reports generated through view layer
 
-## 6. Extensibility Strategy
+### Security Incident Flow
+1. SecurityCameras detect incidents
+2. SecurityNotice created
+3. UrbanMonitoringCenter processes notice
+4. Notification sent to relevant systems
+5. Incident recorded in database
 
-The system is designed for evolution:
-- ✅ Add new device types via subclassing
-- ✅ Extend infraction categories through `InfractionType`
-- ✅ Integrate with external systems (e.g. maps, traffic feeds)
-- ✅ Persist data to external storage systems
-- ✅ Expand reporting and simulation tools
+## 6. Exception Handling
+```markdown
+Custom Exceptions:
+- DisconnectedTrafficLightException
+- UnrepairableDeviceException
 
----
+Error Management:
+- Device failure tracking
+- Service request generation
+- Status monitoring
+```
 
-## 7. Class Diagram
+## 7. Data Persistence
+- PostgreSQL database
+- Photo/video storage
+- PDF report generation
+- Geographic data management
 
-The following UML class diagram illustrates the relationships and high-level structure of system components. For detailed descriptions of classes and fields, refer to the separate [Data Dictionary](Data_Dictionary.md).
+## 8. User Interface
+- JavaFX-based interface
+- Interactive map visualization
+- Real-time device monitoring
+- Report generation and viewing
+- Security notice management
 
-![Urban Monitoring Center UML](UML_Classes_Diagram.png)
-
----
-
-## 8. Security & Operational Concerns
-
-- Sensitive user and vehicle data should be protected
-- Access control may be required for administrative actions
-- Error simulation and failure handling is supported in traffic light logic and device monitoring
-
----
+This architecture provides a robust foundation for urban monitoring with clear separation of concerns and modular design.

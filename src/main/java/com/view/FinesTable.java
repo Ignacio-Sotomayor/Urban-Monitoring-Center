@@ -24,7 +24,8 @@ public class FinesTable extends IssuedTable {
     @Override
     public void update() {
         SwingUtilities.invokeLater(() -> {
-            getModel().setRowCount(0); // Limpiar tabla
+
+                this.getModel().setRowCount(0); // Limpiar tabla
             finesMap.clear();
 
             FineDAO fineDao = new FineDAO();

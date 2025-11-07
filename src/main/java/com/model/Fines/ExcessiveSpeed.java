@@ -15,18 +15,17 @@ public class ExcessiveSpeed extends InfractionType {
     }
 
 
-    public void calculateImportScoring(double automobileSpeed, double speedLimit){
-        BigDecimal imp = getAmount();
+    public Object[] calculateFineForSpeed(double automobileSpeed, double speedLimit) {
+        BigDecimal amount = getAmount();
         int score = getScoring();
-        int Excess = (int)((automobileSpeed - speedLimit)/(speedLimit * 0.1));
+        int excessSteps = (int)((automobileSpeed - speedLimit) / (speedLimit * 0.1));
 
-        for(int i=0; i<Excess; i++){
-            imp.add(surchargePer10PercentExcess);
+        for (int i = 0; i < excessSteps; i++) {
+            amount = amount.add(surchargePer10PercentExcess);
             score += 1;
         }
 
-        setAmount(imp);
-        setScoring(score);
+        return new Object[]{amount, score};
     }
 
 

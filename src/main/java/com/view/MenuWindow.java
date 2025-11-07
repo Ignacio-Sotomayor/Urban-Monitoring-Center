@@ -2,10 +2,9 @@ package com.view;
 
 import javax.swing.*;
 import java.awt.*;
-import com.view.FailuresWindow;
 
-import com.controller.UrbanMonitoringCenter;
-import javafx.application.Platform;
+import com.view.MotorVehicleRegistry.InsertWindow;
+import com.view.MotorVehicleRegistry.ViewWindow;
 import javafx.embed.swing.JFXPanel;
 import com.view.Reports.*;
 
@@ -13,6 +12,7 @@ public class MenuWindow extends JFrame {
 
     private MapWindow mapWindow;
     private FailuresWindow failuresWindow;
+    private InsertWindow insertWindow;
 
     public MenuWindow() {
         super("Urban Monitoring Center");
@@ -28,6 +28,15 @@ public class MenuWindow extends JFrame {
         JButton camerasButton = new JButton("Cameras");
         JButton reportsButton = new JButton("Reports");
         JButton failPanelButton = new JButton("Fail Panel");
+        JButton motorVehicleButton = new JButton("Motor Vehicle Registry");
+        JButton addButton = new JButton("Ingresar al sistema");
+        
+        addButton.addActionListener(e->{ 
+            if (insertWindow == null)
+                insertWindow = new InsertWindow();
+            insertWindow.setVisible(true);
+            insertWindow.toFront();
+        });
 
         mapButton.addActionListener(e -> {
             if (mapWindow == null)
@@ -49,23 +58,23 @@ public class MenuWindow extends JFrame {
             failuresWindow.toFront();
         });
 
-        // Botón REPORTS → abre submenú con opciones
+        motorVehicleButton.addActionListener(e -> openMVRMenu());;
+
         reportsButton.addActionListener(e -> openReportsMenu());
 
         add(mapButton);
         add(camerasButton);
         add(reportsButton);
         add(failPanelButton);
+        add(motorVehicleButton);
     }
 
     private void openReportsMenu() {
-        // Creamos el diálogo modal
         JDialog reportsDialog = new JDialog(this, "Reports Menu", true);
         reportsDialog.setSize(350, 350);
         reportsDialog.setLocationRelativeTo(this);
         reportsDialog.setLayout(new GridLayout(6, 1, 10, 10)); // 5 botones + 1 de Close
 
-        // Botones de reportes
         JButton devicesStateButton = new JButton("Devices State");
         JButton finesListButton = new JButton("Fines List");
         JButton carFinesButton = new JButton("Particular Automobile Fines List");
@@ -73,7 +82,6 @@ public class MenuWindow extends JFrame {
         JButton deviceEventsButton = new JButton("Device Events");
         JButton closeButton = new JButton("Close");
 
-        // Acción: abrir cada reporte y cerrar el diálogo
         devicesStateButton.addActionListener(e -> {
             reportsDialog.dispose();
             new DevicesStateWindow().setVisible(true);
@@ -99,10 +107,8 @@ public class MenuWindow extends JFrame {
             new DeviceEventsWindow().setVisible(true);
         });
 
-        // Botón para cerrar el diálogo sin abrir nada
         closeButton.addActionListener(e -> reportsDialog.dispose());
 
-        // Añadir botones al diálogo
         reportsDialog.add(devicesStateButton);
         reportsDialog.add(finesListButton);
         reportsDialog.add(carFinesButton);
@@ -111,5 +117,40 @@ public class MenuWindow extends JFrame {
         reportsDialog.add(closeButton);
 
         reportsDialog.setVisible(true);
+    }
+
+    private void openMVRMenu() {
+        JDialog MVRDialog = new JDialog(this, "Motor Vehicle Registry", true);
+        MVRDialog.setSize(350, 350);
+        MVRDialog.setLocationRelativeTo(this);
+        MVRDialog.setLayout(new GridLayout(3, 1, 10, 10));
+
+        JButton insert = new JButton("Insert");
+        JButton view = new JButton("View");
+        JButton closeButton = new JButton("Close");
+
+        insert.addActionListener(e -> {
+            MVRDialog.dispose();
+            new InsertWindow().setVisible(true);
+        });
+
+        view.addActionListener(e -> {
+            MVRDialog.dispose();
+            new ViewWindow().setVisible(true);
+        });
+
+
+
+
+        closeButton.addActionListener(e -> MVRDialog.dispose());
+
+        MVRDialog.add(insert);
+        /* Due a rollback caused by a computer brock down
+        * the Update delete and view of the owners, models, brands and automobiles the view section
+        * isn't ready to be integrated to the project*/
+        //MVRDialog.add(view);
+        MVRDialog.add(closeButton);
+
+        MVRDialog.setVisible(true);
     }
 }

@@ -1,17 +1,17 @@
 package com.DAO;
 
+import com.model.Automobile.Brand;
 import com.model.Automobile.Owner;
 
 import javax.xml.transform.Result;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OwnersDAO {
     public Integer insertOwner(String legalID, String fullName, String Address) throws SQLException {
         String sql = "INSERT INTO Owners (Owner_LegalID, Owner_FullName, Owner_Address) VALUES (?, ?, ?)";
-        int id=0;
+        int id=99;
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ){
@@ -36,6 +36,21 @@ public class OwnersDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public Map<Integer, Owner> getAllBrands()throws SQLException{
+        Map<Integer,Owner> response= new HashMap<>();
+        String sql = "Select * From Owners";
+
+        try(Connection conn = DBConnection.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)
+        ){
+            while(rs.next())
+                response.put( Integer.valueOf( rs.getInt("Owner_IdOwner_name")) ,new Owner( rs.getString("Owner_LegalID"),rs.getString("Owner_FullName"),rs.getString("Owner_address")) );
+        }
+        return response;
+    }
+
     public int getOwnerIdByLegalID(String legalID)throws SQLException{
         String sql = "SELECT Owner_ID FORM OWNERS WHERE Owner_LegalID = ?";
         int response=0;

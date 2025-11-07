@@ -12,6 +12,7 @@ module com.view {
     requires java.desktop;
     requires java.sql;
     requires itextpdf;
+    requires com.fasterxml.jackson.databind;
 
 
     opens com.view to javafx.fxml;
@@ -20,4 +21,6 @@ module com.view {
     opens com.view.Reports to javafx.fxml;
     exports com.controller;
     opens com.controller to javafx.fxml;
+    exports com.view.MotorVehicleRegistry;
+    opens com.view.MotorVehicleRegistry to javafx.fxml;
 }

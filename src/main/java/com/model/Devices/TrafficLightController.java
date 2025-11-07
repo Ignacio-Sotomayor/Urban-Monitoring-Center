@@ -104,26 +104,6 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         intersectionLights.get(0).changeState(mainLightState);
         intersectionLights.get(1).changeState(secondaryLightState);
     }
-    public boolean isIntermittentTime() {
-        LocalTime now = LocalTime.now();
-        boolean isIntermittentPeriod = false;
-        if (intermittentStartTime != null && intermittentEndTime != null) {
-            if (intermittentStartTime.isAfter(intermittentEndTime)) {
-                isIntermittentPeriod = now.isAfter(intermittentStartTime) || now.isBefore(intermittentEndTime);
-            } else {
-                isIntermittentPeriod = now.isAfter(intermittentStartTime) && now.isBefore(intermittentEndTime);
-            }
-        }
-        return forceIntermittent || isIntermittentPeriod;
-    }
-
-    @Override
-    public void repair() throws UnrepairableDeviceException{
-        if(repairable)
-            super.repair();
-        else
-            throw new UnrepairableDeviceException(this,"One of the traffic lights lost communication");
-    }
 
     public boolean isIntermittentTime() {
         LocalTime now = LocalTime.now();
@@ -146,52 +126,6 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
             throw new UnrepairableDeviceException(this,"One of the traffic lights lost communication");
     }
 
-    @Override
-    public String getIconPath() {
-        // Priority: Controller Fatal Error > Controller Inoperative > Intermittent Time > Individual Light State
-        if (UrbanMonitoringCenter.getUrbanMonitoringCenter().isFatalError(this)) { // Check controller fatal error
-            URL resource = getClass().getResource("/Icons/FatalErrorTrafficLight.png");
-            return resource != null ? resource.toExternalForm() : "";
-        }
-        if (!getState()) { // Check controller inoperative (not fatal)
-            URL resource = getClass().getResource("/Icons/InoperativeTrafficLight.png");
-            return resource != null ? resource.toExternalForm() : "";
-        }
-        // If no controller-level issues, check individual main light state
-        TrafficLight main = intersectionLights.get(0);
-        if (main.getCurrentState() == TrafficLightState.UNKNOWN || main.getCurrentState() == TrafficLightState.INOPERATIVE) {
-            URL resource = getClass().getResource(main.getCurrentState().getIconPath());
-            return resource != null ? resource.toExternalForm() : "";
-        }
-        // If intermittent time, show yellow icon
-        if (isIntermittentTime()) {
-            URL resource = getClass().getResource(TrafficLightState.INTERMITTENT.getIconPath());
-            return resource != null ? resource.toExternalForm() : "";
-        }
-        URL resource = getClass().getResource(main.getCurrentState().getIconPath());
-        return resource != null ? resource.toExternalForm() : "";
-    }
-
-    @Override
-    public String getDeviceTypeName() {
-        return "TrafficLightController";
-    }
-
-    @Override
-    public String getDeviceSpecificInfo() {
-        TrafficLight main = intersectionLights.get(0);
-        TrafficLight secondary = intersectionLights.get(1);
-
-        String info = "";
-        if (isIntermittentTime()) {
-            info += "<br><b>MODO INTERMITTENTE</b>";
-        } else {
-            info += "<br>Principal: " + main.getCurrentState();
-            if (!main.isOperative()) info += " (Inoperativa)";
-            info += "<br>Secundario: " + secondary.getCurrentState();
-            if (!secondary.isOperative()) info += " (Inoperativa)";
-        }
-        return info;
     @Override
     public String getIconPath() {
         // Priority: Controller Fatal Error > Controller Inoperative > Intermittent Time > Individual Light State

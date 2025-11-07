@@ -38,7 +38,7 @@ public abstract class FineIssuerDevice extends Device{
 
     public void issueFine(Automobile a){
         MotorVehicleRegistry MVR = MotorVehicleRegistry.getMotorVehicleRegistry();
-        Fine fine = new Fine( new EventGeolocation(LocalDateTime.now(),super.getAddress(), super.getLocation(), this), emitedInfractionType,a);
+        Fine fine = new Fine( new EventGeolocation(LocalDateTime.now(),super.getAddress(), this, super.getLocation()), emitedInfractionType,a);
         try{
             InfractionTypesDAO infractionDao = new InfractionTypesDAO();
             Integer infractionTypeID = infractionDao.getInfractionTypeIdByName(fine.getInfractionType().getName());

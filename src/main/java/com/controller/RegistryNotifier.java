@@ -1,6 +1,5 @@
 package com.controller;
 
-import com.model.Fines.Fine;
 import com.view.IssuedTable;
 
 public class RegistryNotifier {
@@ -22,7 +21,4 @@ public class RegistryNotifier {
         return instance;
     }
 
-    public void updateFinesTable(Fine f){
-        issuedTable.update();
-    }
 }

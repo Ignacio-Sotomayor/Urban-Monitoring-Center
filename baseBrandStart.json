@@ -1,0 +1,113 @@
+[
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia 2500",
+    "location": { "lat": -38.002863, "lng": -57.558199 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "Gascon", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia 2400",
+    "location": { "lat": -38.002053, "lng": -57.557535 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "Falucho", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia 2300",
+    "location": { "lat": -38.001261, "lng": -57.556904 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "Almirante Brown", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia, Av. Colon",
+    "location": { "lat": -38.000394, "lng": -57.556213 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "Av. Colon", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia 2100",
+    "location": { "lat": -37.999542, "lng": -57.555559 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "Bolivar", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia 2000",
+    "location": { "lat": -37.998758, "lng": -57.554895 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "Moreno", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia 1900",
+    "location": { "lat": -37.997960, "lng": -57.554263 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "Belgrano", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia 1800",
+    "location": { "lat": -37.997194, "lng": -57.553623 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "Rivadavia", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "TrafficLightController",
+    "address": "Av. Independencia 1700",
+    "location": { "lat": -37.996395, "lng": -57.552932 },
+    "active": true,
+    "mainLight": { "street": "Av. Independencia", "crossing": "Av. Independencia", "isMain": true, "state": "GREEN" },
+    "secondaryLight": { "street": "Av. Independencia", "crossing": "San Martin", "isMain": false, "state": "RED" }
+  },
+  {
+    "type": "Radar",
+    "address": "Av. Pedro Luro 3242",
+    "location": { "lat": -37.995296, "lng": -57.552912 },
+    "active": true,
+    "speedLimit": 60
+  },
+  {
+    "type": "Radar",
+    "address": "Av. Pedro Luro 2556",
+    "location": { "lat": -37.998900, "lng": -57.545851 },
+    "active": true,
+    "speedLimit": 60
+  },
+  {
+    "type": "SecurityCamera",
+    "address": "Peatonal San Martin 2802",
+    "location": { "lat": -37.998457, "lng": -57.549009 },
+    "active": true
+  },
+  {
+    "type": "SecurityCamera",
+    "address": "25 de Mayo 2700",
+    "location": { "lat": -37.997282, "lng": -57.546280 },
+    "active": true
+  },
+  {
+    "type": "SecurityCamera",
+    "address": "Rivadavia 3300",
+    "location": { "lat": -37.997841, "lng": -57.552919 },
+    "active": true
+  },
+  {
+    "type": "ParkingLotSecurityCamera",
+    "address": "Av. Colon 2900",
+    "location": { "lat": -38.002099, "lng": -57.553031 },
+    "active": true,
+    "recordingDurationSeconds": 1200
+  }
+]

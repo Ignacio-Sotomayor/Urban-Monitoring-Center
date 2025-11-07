@@ -1,12 +1,8 @@
 package com.model.Devices;
-import com.model.Devices.TrafficLightState;
-import com.model.UnrepairableDeviceException;
-import com.model.DisconnectedTrafficLightException;
+
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.net.URL;
-import java.util.Random;
 
 public class TrafficLight implements Serializable {
     @Serial

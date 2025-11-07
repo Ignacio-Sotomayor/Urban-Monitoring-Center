@@ -24,4 +24,7 @@ public abstract class IssuedTable extends JTable {
     }
 
     public abstract void update() ;
+
+    public void update(String[] columnNames) {
+    }
 }

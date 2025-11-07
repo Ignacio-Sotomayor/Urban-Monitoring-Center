@@ -15,6 +15,7 @@ import java.util.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.model.Devices.Device;
+import com.model.Fines.ExcessiveSpeedFine;
 import com.model.Fines.Fine;
 
 public class PDFGenerator {
@@ -59,15 +60,19 @@ public class PDFGenerator {
             document.add(new Paragraph("Titular: " + fine.getAutomobile().getOwner().getFullName()));
             document.add(new Paragraph("DNI: " + fine.getAutomobile().getOwner().getLegalIid()));
             document.add(new Paragraph("Domicilio: " + fine.getAutomobile().getOwner().getAddress()));
-            document.add(new Paragraph("Automóvil: " + fine.getAutomobile().getBrand() + " " + fine.getAutomobile().getModel()));
+            document.add(new Paragraph("Automóvil: " + fine.getAutomobile().getBrand().getName() + " " + fine.getAutomobile().getModel().getName()));
             document.add(new Paragraph("Patente: " + fine.getAutomobile().getLicensePlate()));
             document.add(new Paragraph(" "));
 
             document.add(new Paragraph("Tipo de infracción: " + fine.getInfractionType().getDescription()));
+            if(fine.getClass().getSimpleName().equals(ExcessiveSpeedFine.class.getSimpleName())){
+                document.add(new Paragraph("Velocidad Maxima permitida"+ ((ExcessiveSpeedFine)fine).getSpeedLimit()));
+                document.add(new Paragraph("Velocidad del automobile"+ ((ExcessiveSpeedFine)fine).getAutomobileSpeed()));
+            }
             document.add(new Paragraph("Lugar: " + fine.getEventGeolocation().getAddress()));
             document.add(new Paragraph("Fecha/Hora: " + fine.getEventGeolocation().getDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
             document.add(new Paragraph("Valor a pagar: $" + fine.getAmount()));
-            document.add(new Paragraph("Puntos a reducir: "));
+            document.add(new Paragraph("Puntos a reducir: "+ fine.getScoring()));
             document.add(new Paragraph(" "));
 
             String barcodeValue = generateBarcode(fineNumber, fine.getAmount());
