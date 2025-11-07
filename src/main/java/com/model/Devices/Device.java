@@ -38,6 +38,8 @@ public abstract class Device implements Serializable {
         this.state = state;
     }
     public abstract String getIconPath();
+    public abstract String getDeviceTypeName();
+    public abstract String getDeviceSpecificInfo();
 
     @Override
     public boolean equals(Object o) {

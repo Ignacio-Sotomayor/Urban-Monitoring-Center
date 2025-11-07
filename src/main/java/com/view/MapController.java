@@ -72,37 +72,17 @@ public class MapController {
         simulationTimer = new Timer(true);
         UrbanMonitoringCenter umc = UrbanMonitoringCenter.getUrbanMonitoringCenter();
 
-        TimerTask failureTask = new TimerTask() {
-            @Override
-            public void run() {
-                if (devices == null || devices.isEmpty()) return;
-
-                Random random = new Random();
-                Device deviceToChange = devices.get(random.nextInt(devices.size()));
-
-                if (umc.isFatalError(deviceToChange) || !deviceToChange.getState()) return;
-
-                if (random.nextDouble() < 0.05) {
-                    umc.setFatalError(deviceToChange);
-                } else {
-                    umc.issuedDevices(deviceToChange);
-                }
-            }
-        };
-
         TimerTask uiUpdateTask = new TimerTask() {
             @Override
             public void run() {
                 if (devices == null || devices.isEmpty()) return;
 
-                // Check for repair requests
                 Platform.runLater(() -> {
                     processRepairQueue("getAndClearRepairQueue", false);
                     processRepairQueue("getAndClearIntermittentRepairQueue", true);
-                    processRepairQueue("getAndClearNormalModeQueue", false); // Re-uses the normal repair logic
+                    processRepairQueue("getAndClearNormalModeQueue", false);
                 });
 
-                // Update UI for all devices
                 devices.forEach(d -> {
                     String status = umc.isFatalError(d) ? "ERROR FATAL" : (d.getState() ? "OPERATIVO" : "NO OPERATIVO");
                     String popupText = getPopupTextForDevice(d);
@@ -118,7 +98,6 @@ public class MapController {
             }
         };
 
-        simulationTimer.schedule(failureTask, 10000, 10000);
         simulationTimer.schedule(uiUpdateTask, 250, 250);
     }
 
@@ -149,52 +128,23 @@ public class MapController {
     private String getIconForDevice(Device device) {
         UrbanMonitoringCenter umc = UrbanMonitoringCenter.getUrbanMonitoringCenter();
         if (umc.isFatalError(device)) {
-            return "/Icons/FatalErrorTrafficLight.png";
+            URL resource = getClass().getResource("/Icons/FatalErrorTrafficLight.png");
+            return resource != null ? resource.toExternalForm() : device.getIconPath(); // Fallback to device's default icon
         }
-
-        String iconPath = "";
-        boolean isOperative = device.getState();
-
-        if (device instanceof TrafficLightController) {
-            TrafficLightController tlc = (TrafficLightController) device;
-            if (!isOperative) {
-                iconPath = "/Icons/InoperativeTrafficLight.png";
-            } else if (tlc.isIntermittentTime()) {
-                iconPath = "/Icons/TrafficLightYellow.png";
-            } else {
-                iconPath = tlc.getIntersectionLights().get(0).getCurrentState().getIconPath();
-            }
-        } else if (device instanceof Radar) {
-            iconPath = isOperative ? "/Icons/OperativeRadar.png" : "/Icons/InoperativeRadar.png";
-        } else if (device instanceof ParkingLotSecurityCamera) {
-            iconPath = isOperative ? "/Icons/OperativeParkingLotCamera.png" : "/Icons/InoperativeParkingLotCamera.png";
-        } else if (device instanceof SecurityCamera) {
-            iconPath = isOperative ? "/Icons/OperativeSecurityCamera.png" : "/Icons/InoperativeSecurityCamera.png";
+        // If not a fatal error, check if the device is simply not operative
+        if (!device.getState()) {
+            // Assuming a generic icon for non-operative devices exists
+            URL resource = getClass().getResource("/Icons/NonOperativeDevice.png");
+            return resource != null ? resource.toExternalForm() : device.getIconPath(); // Fallback to device's default icon
         }
-
-        URL resource = getClass().getResource(iconPath);
-        return resource != null ? resource.toExternalForm() : "";
+        // Otherwise, get the default icon from the device itself
+        return device.getIconPath();
     }
 
     private String getPopupTextForDevice(Device device) {
-        String type = "Dispositivo";
-        if (device instanceof TrafficLightController) {
-            type = "Controlador de Semáforos";
-            TrafficLightController tlc = (TrafficLightController) device;
-            if (tlc.isIntermittentTime()) {
-                type += "<br><b>MODO INTERMITENTE</b>";
-            } else {
-                type += "<br>Principal: " + tlc.getIntersectionLights().get(0).getCurrentState();
-                type += "<br>Secundario: " + tlc.getIntersectionLights().get(1).getCurrentState();
-            }
-        } else if (device instanceof Radar) {
-            type = "Radar de Velocidad";
-        } else if (device instanceof ParkingLotSecurityCamera) {
-            type = "Cámara de Aparcamiento";
-        } else if (device instanceof SecurityCamera) {
-            type = "Cámara de Seguridad";
-        }
-        return "<b>" + device.getAddress() + "</b><br>" + type;
+        return "<b>" + device.getAddress() + "</b><br>" +
+               device.getDeviceTypeName() +
+               device.getDeviceSpecificInfo();
     }
 
     public void shutdown() {

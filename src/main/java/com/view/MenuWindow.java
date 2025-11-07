@@ -2,11 +2,17 @@ package com.view;
 
 import javax.swing.*;
 import java.awt.*;
+import com.view.FailuresWindow;
+
+import com.controller.UrbanMonitoringCenter;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 import com.view.Reports.*;
 
 public class MenuWindow extends JFrame {
 
     private MapWindow mapWindow;
+    private FailuresWindow failuresWindow;
 
     public MenuWindow() {
         super("Urban Monitoring Center");
@@ -14,14 +20,15 @@ public class MenuWindow extends JFrame {
         setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        new JFXPanel();
         setLayout(new FlowLayout(FlowLayout.CENTER, 20, 40));
 
-        // Botones principales
         JButton mapButton = new JButton("Map");
         JButton camerasButton = new JButton("Cameras");
         JButton reportsButton = new JButton("Reports");
+        JButton failPanelButton = new JButton("Fail Panel");
 
-        // Botón MAP
         mapButton.addActionListener(e -> {
             if (mapWindow == null)
                 mapWindow = new MapWindow();
@@ -29,19 +36,26 @@ public class MenuWindow extends JFrame {
             mapWindow.toFront();
         });
 
-        // Botón CAMERAS
         camerasButton.addActionListener(e -> {
             CamerasWindow camerasWindow = new CamerasWindow();
             camerasWindow.setVisible(true);
         });
 
+        failPanelButton.addActionListener(e -> {
+            if (failuresWindow == null || !failuresWindow.isDisplayable()) {
+                failuresWindow = new FailuresWindow();
+            }
+            failuresWindow.setVisible(true);
+            failuresWindow.toFront();
+        });
+
         // Botón REPORTS → abre submenú con opciones
         reportsButton.addActionListener(e -> openReportsMenu());
 
-        // Agregar los tres botones
         add(mapButton);
         add(camerasButton);
         add(reportsButton);
+        add(failPanelButton);
     }
 
     private void openReportsMenu() {

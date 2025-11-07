@@ -39,7 +39,9 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         this.bothRedLightsDuration = bothRedLightsDuration;
         intersectionLights.add(0, mainLight);
         intersectionLights.add(1, secondaryLight);
-        repairable = mainLight.getCurrentState()!=TrafficLightState.UNKNOWN && secondaryLight.getCurrentState()!=TrafficLightState.UNKNOWN;
+        repairable = mainLight.isOperative() && secondaryLight.isOperative() &&
+                     mainLight.getCurrentState() != TrafficLightState.UNKNOWN &&
+                     secondaryLight.getCurrentState() != TrafficLightState.UNKNOWN;
     }
 
     public TrafficLightController(String address, Location location,boolean state, TrafficLight mainLight, TrafficLight secondaryLight){
@@ -50,7 +52,9 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         bothRedLightsDuration = Duration.ofSeconds(3);
         intersectionLights.add(0, mainLight);
         intersectionLights.add(1, secondaryLight);
-        repairable = mainLight.getCurrentState()!=TrafficLightState.UNKNOWN && secondaryLight.getCurrentState()!=TrafficLightState.UNKNOWN;
+        repairable = mainLight.isOperative() && secondaryLight.isOperative() &&
+                     mainLight.getCurrentState() != TrafficLightState.UNKNOWN &&
+                     secondaryLight.getCurrentState() != TrafficLightState.UNKNOWN;
     }
 
     public TrafficLightController(String address, Location location, boolean state, @Nullable LocalTime intermittentStartTime, @Nullable LocalTime intermittentEndTime, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
@@ -63,18 +67,11 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         this.bothRedLightsDuration = bothRedLightsDuration;
         intersectionLights.add(mainLight);
         intersectionLights.add(secondaryLight);
-        repairable = mainLight.getCurrentState()!=TrafficLightState.UNKNOWN && secondaryLight.getCurrentState()!=TrafficLightState.UNKNOWN;
+        repairable = mainLight.isOperative() && secondaryLight.isOperative() &&
+                     mainLight.getCurrentState() != TrafficLightState.UNKNOWN &&
+                     secondaryLight.getCurrentState() != TrafficLightState.UNKNOWN;
     }
 
-    //getters
-    public long getTotalCycleMillis() {
-        return (greenLightDuration.toMillis() +
-                yellowLightDuration.toMillis() +
-                bothRedLightsDuration.toMillis() +
-                redLightDuration.toMillis() + // This is green for the other light
-                yellowLightDuration.toMillis() +
-                bothRedLightsDuration.toMillis());
-    }
     public ArrayList<TrafficLight> getIntersectionLights() { return intersectionLights; }
     public long getInitialDelay() { return initialDelay; }
     public @Nullable LocalTime getIntermittentStartTime() { return intermittentStartTime; }
@@ -97,13 +94,8 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
     public void setForceIntermittent(boolean forceIntermittent) { this.forceIntermittent = forceIntermittent; }
 
     public void changeTrafficLightsIntermittent(){
-        try{
         intersectionLights.get(0).changeState(TrafficLightState.INTERMITTENT);
         intersectionLights.get(1).changeState(TrafficLightState.INTERMITTENT);
-        } catch (DisconnectedTrafficLightException e) {
-            breakDevice();
-            repairable= false;
-        }
     }
     public void changeTrafficLights(TrafficLightState mainLightState, TrafficLightState secondaryLightState){
         intersectionLights.get(0).changeState(mainLightState);
@@ -114,16 +106,16 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         intersectionLights.get(1).setState(TrafficLightState.RED);
     }
     public boolean isIntermittentTime() {
-        if (forceIntermittent) return true;
-        else if (intermittentStartTime == null || intermittentEndTime == null)
-            return false;
-        else {
-            LocalTime now = LocalTime.now();
-            if (intermittentStartTime.isAfter(intermittentEndTime))
-                return now.isAfter(intermittentStartTime) || now.isBefore(intermittentEndTime);
-            else
-                return now.isAfter(intermittentStartTime) && now.isBefore(intermittentEndTime);
+        LocalTime now = LocalTime.now();
+        boolean isIntermittentPeriod = false;
+        if (intermittentStartTime != null && intermittentEndTime != null) {
+            if (intermittentStartTime.isAfter(intermittentEndTime)) {
+                isIntermittentPeriod = now.isAfter(intermittentStartTime) || now.isBefore(intermittentEndTime);
+            } else {
+                isIntermittentPeriod = now.isAfter(intermittentStartTime) && now.isBefore(intermittentEndTime);
+            }
         }
+        return forceIntermittent || isIntermittentPeriod;
     }
 
     @Override
@@ -136,16 +128,50 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
 
     @Override
     public String getIconPath() {
-        String path;
-        if(! getState() && !repairable)
-            path="/Icons/FatalErrorTrafficLight.png";
-        else if (!getState())
-            path = "/Icons/InoperativeTrafficLight.png";
-        else
-            path = (this.intersectionLights.getFirst().getCurrentState()!=null)?this.intersectionLights.getFirst().getCurrentState().getIconPath():TrafficLightState.UNKNOWN.getIconPath();
-
-        URL resource = getClass().getResource(path);
+        // Priority: Controller Fatal Error > Controller Inoperative > Intermittent Time > Individual Light State
+        if (UrbanMonitoringCenter.getUrbanMonitoringCenter().isFatalError(this)) { // Check controller fatal error
+            URL resource = getClass().getResource("/Icons/FatalErrorTrafficLight.png");
+            return resource != null ? resource.toExternalForm() : "";
+        }
+        if (!getState()) { // Check controller inoperative (not fatal)
+            URL resource = getClass().getResource("/Icons/InoperativeTrafficLight.png");
+            return resource != null ? resource.toExternalForm() : "";
+        }
+        // If no controller-level issues, check individual main light state
+        TrafficLight main = intersectionLights.get(0);
+        if (main.getCurrentState() == TrafficLightState.UNKNOWN || main.getCurrentState() == TrafficLightState.INOPERATIVE) {
+            URL resource = getClass().getResource(main.getCurrentState().getIconPath());
+            return resource != null ? resource.toExternalForm() : "";
+        }
+        // If intermittent time, show yellow icon
+        if (isIntermittentTime()) {
+            URL resource = getClass().getResource(TrafficLightState.INTERMITTENT.getIconPath());
+            return resource != null ? resource.toExternalForm() : "";
+        }
+        URL resource = getClass().getResource(main.getCurrentState().getIconPath());
         return resource != null ? resource.toExternalForm() : "";
+    }
+
+    @Override
+    public String getDeviceTypeName() {
+        return "TrafficLightController";
+    }
+
+    @Override
+    public String getDeviceSpecificInfo() {
+        TrafficLight main = intersectionLights.get(0);
+        TrafficLight secondary = intersectionLights.get(1);
+
+        String info = "";
+        if (isIntermittentTime()) {
+            info += "<br><b>MODO INTERMITTENTE</b>";
+        } else {
+            info += "<br>Principal: " + main.getCurrentState();
+            if (!main.isOperative()) info += " (Inoperativa)";
+            info += "<br>Secundario: " + secondary.getCurrentState();
+            if (!secondary.isOperative()) info += " (Inoperativa)";
+        }
+        return info;
     }
 
     @Override
@@ -153,26 +179,74 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
         TrafficLight main = intersectionLights.get(0);
         TrafficLight secondary = intersectionLights.get(1);
         try {
-            while (true){
-            if(isIntermittentTime())
-                changeTrafficLightsIntermittent();
-            else{
-                startTrafficLights();
-                Thread.sleep(greenLightDuration);
-                main.changeState(TrafficLightState.INTERMITTENT);
-                Thread.sleep(yellowLightDuration);
-                main.changeState(TrafficLightState.RED);
-                Thread.sleep(bothRedLightsDuration);
-                secondary.changeState(TrafficLightState.GREEN);
-                Thread.sleep(redLightDuration);
-                secondary.changeState(TrafficLightState.INTERMITTENT);
-                Thread.sleep(yellowLightDuration);
+            Thread.sleep(initialDelay);
+
+            // Initial state (Step 1)
+            main.changeState(TrafficLightState.GREEN);
+            secondary.changeState(TrafficLightState.RED);
+            // Removed checkFaults() call
+
+            while (true) {
+                // If controller is in fatal error, stop its cycle
+                if (UrbanMonitoringCenter.getUrbanMonitoringCenter().isFatalError(this)) {
+                    Thread.sleep(5000); // Wait if in fatal error
+                    continue;
+                }
+
+                // Handle Intermittent Time (sustained yellow)
+                if (isIntermittentTime()) {
+                    changeTrafficLightsIntermittent(); // This method sets lights to INTERMITTENT
+                    Thread.sleep(10000); // Stay in intermittent mode for a while
+                    continue; // Skip the normal cycle
+                }
+
+                // Ensure lights are operative before starting cycle if they were inoperative (but not UNKNOWN)
+                // If a light is INOPERATIVE (not UNKNOWN), setting a new state will make it operative again
+                if (main.getCurrentState() == TrafficLightState.UNKNOWN || secondary.getCurrentState() == TrafficLightState.UNKNOWN) {
+                    Thread.sleep(5000); // Wait if in fatal error
+                    continue;
+                }
+
+                // Step 1: Semaforo A en verde y B en rojo durante 40 seg
+                main.changeState(TrafficLightState.GREEN);
                 secondary.changeState(TrafficLightState.RED);
-                Thread.sleep(bothRedLightsDuration);
-                }
-                }
-            }catch (InterruptedException e) {
-            throw new RuntimeException(e);
+                // Removed checkFaults() call
+                Thread.sleep(greenLightDuration.toMillis());
+
+                // Step 2: Semaforo A en amarillo y B en rojo durante 4 seg
+                main.changeState(TrafficLightState.YELLOW); // Use YELLOW for transition
+                secondary.changeState(TrafficLightState.RED);
+                // Removed checkFaults() call
+                Thread.sleep(yellowLightDuration.toMillis());
+
+                // Step 3: Ambos en rojo durante 3 seg (si el tiempo es mayor se reporta como fallo)
+                main.changeState(TrafficLightState.RED);
+                secondary.changeState(TrafficLightState.RED);
+                // Removed checkFaults() call
+                Thread.sleep(bothRedLightsDuration.toMillis());
+                // Removed both lights RED for too long fault detection
+
+                // Step 4: Semaforo A en rojo y B en verde durante 30 seg
+                main.changeState(TrafficLightState.RED);
+                secondary.changeState(TrafficLightState.GREEN);
+                // Removed checkFaults() call
+                Thread.sleep(redLightDuration.toMillis()); // redLightDuration is for the other light's green
+
+                // Step 5: Semaforo A en rojo y B en amarillo durante 4 seg
+                main.changeState(TrafficLightState.RED);
+                secondary.changeState(TrafficLightState.YELLOW); // Use YELLOW for transition
+                // Removed checkFaults() call
+                Thread.sleep(yellowLightDuration.toMillis());
+
+                // Step 6: Ambos en rojo durante 3 seg (si el tiempo es mayor se reporta como fallo)
+                main.changeState(TrafficLightState.RED);
+                secondary.changeState(TrafficLightState.RED);
+                // Removed checkFaults() call
+                Thread.sleep(bothRedLightsDuration.toMillis());
+                // Removed both lights RED for too long fault detection
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }

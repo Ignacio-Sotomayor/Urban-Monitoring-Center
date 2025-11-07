@@ -26,6 +26,16 @@ public class SecurityCamera extends Device{
         return resource != null ? resource.toExternalForm() : "";
     }
 
+    @Override
+    public String getDeviceTypeName() {
+        return "SecurityCamera";
+    }
+
+    @Override
+    public String getDeviceSpecificInfo() {
+        return ""; // No specific info for a general security camera
+    }
+
     public void issueSecurityNotice(String description, Set<Service> services){
         SecurityNoticeDAO securityNoticeDao = new SecurityNoticeDAO();
         try {

@@ -22,4 +22,14 @@ public class ParkingLotSecurityCamera extends FineIssuerDevice {
         URL resource = getClass().getResource(path);
         return resource != null ? resource.toExternalForm() : "";
     }
+
+    @Override
+    public String getDeviceTypeName() {
+        return "ParkingLotSecurityCamera";
+    }
+
+    @Override
+    public String getDeviceSpecificInfo() {
+        return "<br>Tiempo de tolerancia: " + toleranceTime.toMinutes() + " minutos";
+    }
 }

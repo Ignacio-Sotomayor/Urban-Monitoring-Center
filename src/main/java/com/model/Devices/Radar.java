@@ -48,4 +48,14 @@ public class Radar extends FineIssuerDevice {
         URL resource = getClass().getResource(path);
         return resource != null ? resource.toExternalForm() : "";
     }
+
+    @Override
+    public String getDeviceTypeName() {
+        return "Radar";
+    }
+
+    @Override
+    public String getDeviceSpecificInfo() {
+        return "<br>Límite de velocidad: " + speedLimit + " km/h";
+    }
 }
