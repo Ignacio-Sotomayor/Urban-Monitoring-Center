@@ -1,4 +1,5 @@
 package com.controller;
+import com.DAO.FineDAO;
 import com.DAO.InfractionTypesDAO;
 import com.DAO.OwnersDAO;
 import com.itextpdf.text.Document;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +30,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class UrbanMonitoringCenter {
+
+
+
     // --- Nested Class for Failure Records ---
     public static class FailureRecord {
         private final Device device;
@@ -126,6 +131,15 @@ public class UrbanMonitoringCenter {
         }
     } */
 
+
+    public Device getDeviceByAddress(String address) throws SQLException {
+        for (Device device : devices.values()) {
+            if (device.getAddress().equalsIgnoreCase(address)) {
+                return device;
+            }
+        }
+        return null;
+    }
     public static void baseBrandStart(){
         UrbanMonitoringCenter UMC = getUrbanMonitoringCenter();
         TrafficLightController tf;
@@ -328,71 +342,6 @@ public class UrbanMonitoringCenter {
         }
     }
 
-    private String generateBarcode(int fineNumber, BigDecimal amount) {
-        String finePart = String.format("%06d", fineNumber);
-
-        BigDecimal scaled = amount.setScale(2, BigDecimal.ROUND_HALF_UP);
-        String amountStr = scaled.toPlainString().replace(".", "");
-        amountStr = String.format("%012d", Long.parseLong(amountStr));
-
-        return finePart + amountStr;
-    }
-    public void generateFinePDF(Fine fine, int fineNumber) {
-        Path outputDir = Paths.get("fines");
-        try {
-            if (!Files.exists(outputDir)) Files.createDirectories(outputDir);
-        } catch (IOException e) {
-            System.err.println("No se pudo crear carpeta fines: " + e.getMessage());
-            return;
-        }
-
-        String filename = String.format("Multa_%06d.pdf", fineNumber);
-        Path outputFile = outputDir.resolve(filename);
-
-        Document document = new Document();
-        try {
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outputFile.toFile()));
-            document.open();
-
-            Paragraph header = new Paragraph("Dirección de Tránsito\n");
-            header.setAlignment(Element.ALIGN_CENTER);
-            document.add(header);
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Número de multa: " + String.format("%06d", fineNumber)));
-            document.add(new Paragraph("Fecha de emisión: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
-            document.add(new Paragraph(" "));
-
-            document.add(new Paragraph("Titular: " + fine.getAutomobile().getOwner().getFullName()));
-            document.add(new Paragraph("DNI: " + fine.getAutomobile().getOwner().getLegalIid()));
-            document.add(new Paragraph("Domicilio: " + fine.getAutomobile().getOwner().getAddress()));
-            document.add(new Paragraph("Automóvil: " + fine.getAutomobile().getBrand() + " " + fine.getAutomobile().getModel()));
-            document.add(new Paragraph("Patente: " + fine.getAutomobile().getLicensePlate()));
-            document.add(new Paragraph(" "));
-
-            document.add(new Paragraph("Tipo de infracción: " + fine.getInfractionType().getDescription()));
-            document.add(new Paragraph("Lugar: " + fine.getEventGeolocation().getAddress()));
-            document.add(new Paragraph("Fecha/Hora: " + fine.getEventGeolocation().getDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
-            document.add(new Paragraph("Valor a pagar: $" + fine.getAmount()));
-            document.add(new Paragraph("Puntos a reducir: "));
-            document.add(new Paragraph(" "));
-
-            String barcodeValue = generateBarcode(fineNumber, fine.getAmount());
-            document.add(new Paragraph("Código de barras: " + barcodeValue));
-
-            Barcode128 barcode = new Barcode128();
-            barcode.setCode(barcodeValue);
-            Image barcodeImage = barcode.createImageWithBarcode(writer.getDirectContent(), null, null);
-            barcodeImage.scalePercent(150);
-            barcodeImage.setAlignment(Element.ALIGN_CENTER);
-            document.add(barcodeImage);
-
-            document.close();
-            writer.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public void startSimulations() {
         // Independencia Wave
@@ -428,5 +377,30 @@ public class UrbanMonitoringCenter {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public Set<Fine> getAllFinesFromDevice(String deviceAddress) throws SQLException {
+        Device targetDevice = null;
+        for (Device d : devices.values()) {
+            if (d.getLocation() != null &&
+                    d.getAddress().equalsIgnoreCase(deviceAddress)) {
+                targetDevice = d;
+                break;
+            }
+        }
+
+        if (targetDevice == null) {
+            System.out.println("No se encontró un dispositivo con la dirección: " + deviceAddress);
+            return Collections.emptySet();
+        }
+
+        FineDAO finesDao = new FineDAO();
+
+        Timestamp start = Timestamp.valueOf("2000-01-01 00:00:00");
+        Timestamp end = new Timestamp(System.currentTimeMillis());
+
+        Set<Fine> fines = finesDao.getNFinesByDeviceUUIDBetweenDates(start, end, Integer.MAX_VALUE, 0, targetDevice.getId());
+
+        return fines;
     }
 }

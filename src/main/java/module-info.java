@@ -16,4 +16,6 @@ module com.view {
 
     opens com.view to javafx.fxml;
     exports com.view;
+    exports com.view.Reports;
+    opens com.view.Reports to javafx.fxml;
 }

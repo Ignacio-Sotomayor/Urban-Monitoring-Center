@@ -4,6 +4,7 @@ import com.model.Devices.Location;
 import com.model.Fines.EventGeolocation;
 import com.model.SecurityNotice;
 import com.model.Service;
+import com.model.Devices.Device;
 import com.controller.UrbanMonitoringCenter;
 
 import java.math.BigDecimal;
@@ -12,6 +13,44 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SecurityNoticeDAO {
+
+    public Set<SecurityNotice> getAllSecurityNoticesFromDevice(String deviceAddress) throws SQLException {
+        Set<SecurityNotice> notices = new HashSet<>();
+
+        Device targetDevice = null;
+        for (Device d : UrbanMonitoringCenter.getUrbanMonitoringCenter().getDevices().values()) {
+            if (d.getLocation() != null &&
+                    d.getAddress().equalsIgnoreCase(deviceAddress)) {
+                targetDevice = d;
+                break;
+            }
+        }
+
+        if (targetDevice == null) {
+            System.out.println("No se encontró un dispositivo con la dirección: " + deviceAddress);
+            return notices;
+        }
+        String sql = "SELECT * FROM SecurityNotices WHERE Issuer_DeviceUUID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, targetDevice.getId().toString());
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String description = rs.getString("SecurityNotice_Description");
+                BigDecimal lat = rs.getBigDecimal("SecurityNotice_Latitude");
+                BigDecimal lon = rs.getBigDecimal("SecurityNotice_Longitude");
+                String address = rs.getString("SecurityNotice_Address");
+                Timestamp timestamp = rs.getTimestamp("SecurityNotice_DateTime");
+                Location loc = new Location(lat, lon);
+                EventGeolocation geo = new EventGeolocation(timestamp.toLocalDateTime(), address, loc, targetDevice);
+                SecurityNotice notice = new SecurityNotice(description, geo);
+                notices.add(notice);
+            }
+        }
+        return notices;
+    }
 
     public int insertSecurityNotice(String description, Timestamp timestamp, String address, BigDecimal latitude, BigDecimal longitude, String UUID, Set<Service> calledServices) throws SQLException{
         String sql = "INSERT INTO SecurityNotices (SecurityNotice_Description, SecurityNotice_Latitude, SecurityNotice_Longitude, SecurityNotice_Address, SecurityNotice_DateTime, Issuer_DeviceUUID) VALUES (?, ?, ?, ?, ?, ?)";

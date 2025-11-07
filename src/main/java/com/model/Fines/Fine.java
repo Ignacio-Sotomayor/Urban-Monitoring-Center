@@ -55,6 +55,7 @@ public class Fine {
     }
 
 
+
     @Override
     public String toString() {
         return String.format(" %s \t Amount: %f \t Scoring:%d",eventGeolocation.toString(),amount,scoring);

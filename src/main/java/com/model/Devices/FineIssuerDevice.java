@@ -8,7 +8,7 @@ import com.model.Automobile.MotorVehicleRegistry;
 import com.model.Fines.EventGeolocation;
 import com.model.Fines.Fine;
 import com.model.Fines.InfractionType;
-import com.view.FinesWindow;
+import com.view.Reports.FinesWindow;
 import com.view.RegistryNotifier;
 
 import java.io.Serial;

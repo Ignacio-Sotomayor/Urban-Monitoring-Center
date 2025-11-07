@@ -29,7 +29,7 @@ public class InfractionTypesDAO {
                 InfractionTypeDesc = rs.getString("InfractionType_Description");
                 InfractionTypeScoring = rs.getInt("InfractionType_Scoring");
                 InfractionTypeAmount = rs.getBigDecimal("InfractionType_Amount");
-                surchargePer10PercentExcess = rs.getBigDecimal("surchargePer10PercentExcess");
+                surchargePer10PercentExcess = rs.getBigDecimal("surchangePer10PercentExcess");
             }
         }
         if(surchargePer10PercentExcess !=null)
