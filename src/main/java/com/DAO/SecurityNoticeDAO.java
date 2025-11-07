@@ -126,18 +126,19 @@ public class SecurityNoticeDAO {
         ){
             pstmt.setInt(1,N);
             rs = pstmt.executeQuery();
-        }
-        while(rs.next()){
-            int ID = rs.getInt("SecurityNotice_ID");
-            String description = rs.getString("SecurityNotice_Description");
-            BigDecimal latitude = rs.getBigDecimal("SecurityNotice_Latitude");
-            BigDecimal longitude = rs.getBigDecimal("SecurityNotice_Longitude");
-            String address = rs.getString("SecurityNotice_Address");
-            Timestamp timestamp = rs.getTimestamp("SecurityNotice_DateTime");
-            String uuid = rs.getString("Issuer_DeviceUUID");
+            while(rs.next()){
+                int ID = rs.getInt("SecurityNotice_ID");
+                String description = rs.getString("SecurityNotice_Description");
+                BigDecimal latitude = rs.getBigDecimal("SecurityNotice_Latitude");
+                BigDecimal longitude = rs.getBigDecimal("SecurityNotice_Longitude");
+                String address = rs.getString("SecurityNotice_Address");
+                Timestamp timestamp = rs.getTimestamp("SecurityNotice_DateTime");
+                String uuid = rs.getString("Issuer_DeviceUUID");
 
-            SecurityNotice sn = new SecurityNotice(description,new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(java.util.UUID.fromString(uuid))), detailsDAO.getAllServicesForSecurityNotice(ID));
+                SecurityNotice sn = new SecurityNotice(description,new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(java.util.UUID.fromString(uuid))), detailsDAO.getAllServicesForSecurityNotice(ID));
+            }
         }
+
         return securityNoticies;
     }
 }

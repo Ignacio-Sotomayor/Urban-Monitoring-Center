@@ -1,8 +1,6 @@
 package com.model.Devices;
 
 import com.controller.UrbanMonitoringCenter;
-import com.model.DisconnectedTrafficLightException;
-import com.model.Fines.InfractionType;
 import com.model.UnrepairableDeviceException;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +44,7 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
     }
 
     public TrafficLightController(String address, Location location,boolean state, TrafficLight mainLight, TrafficLight secondaryLight){
-        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("RedLightViolation"));
         redLightDuration = Duration.ofSeconds(30);
         yellowLightDuration = Duration.ofSeconds(4);
         greenLightDuration = Duration.ofSeconds(40);
@@ -59,7 +57,7 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
     }
 
     public TrafficLightController(String address, Location location, boolean state, @Nullable LocalTime intermittentStartTime, @Nullable LocalTime intermittentEndTime, Duration redLightDuration, Duration yellowLightDuration, Duration greenLightDuration, Duration bothRedLightsDuration, TrafficLight mainLight, TrafficLight secondaryLight) {
-        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+        super(address, location,state, UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("RedLightViolation"));
         this.intermittentStartTime = intermittentStartTime;
         this.intermittentEndTime = intermittentEndTime;
         this.redLightDuration = redLightDuration;
@@ -94,8 +92,8 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
     public void setInitialDelay(long initialDelay) { this.initialDelay = initialDelay; }
     public void setForceIntermittent(boolean forceIntermittent) { this.forceIntermittent = forceIntermittent; }
 
-    public void setEmitedInfractionType(){
-        super.setEmitedInfractionType(UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("CrossingRedLight"));
+    public void setEmittedInfractionType(){
+        super.setEmittedInfractionType(UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("RedLightViolation"));
     }
 
     public void changeTrafficLightsIntermittent(){
@@ -105,10 +103,6 @@ public class TrafficLightController extends FineIssuerDevice implements Runnable
     public void changeTrafficLights(TrafficLightState mainLightState, TrafficLightState secondaryLightState){
         intersectionLights.get(0).changeState(mainLightState);
         intersectionLights.get(1).changeState(secondaryLightState);
-    }
-    public void startTrafficLights(){
-        intersectionLights.get(0).setState(TrafficLightState.GREEN);
-        intersectionLights.get(1).setState(TrafficLightState.RED);
     }
     public boolean isIntermittentTime() {
         LocalTime now = LocalTime.now();

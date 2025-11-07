@@ -4,7 +4,6 @@ import com.DAO.AutomobileDAO;
 import com.DAO.FineDAO;
 import com.model.Automobile.Automobile;
 import com.controller.UrbanMonitoringCenter;
-import com.model.Fines.InfractionType;
 
 import java.io.Serial;
 import java.net.URL;
@@ -22,8 +21,8 @@ public class Radar extends FineIssuerDevice {
         this.speedLimit = speedLimit;
     }
 
-    public void setEmitedInfractionType(){
-        super.setEmitedInfractionType(UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("Speeding"));
+    public void setEmittedInfractionType(){
+        super.setEmittedInfractionType(UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificInfractionType("Speeding"));
     }
     public void setSpeedLimit(double speedLimit) {
         this.speedLimit = speedLimit;

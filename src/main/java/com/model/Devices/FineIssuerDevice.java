@@ -8,7 +8,6 @@ import com.model.Automobile.MotorVehicleRegistry;
 import com.model.Fines.EventGeolocation;
 import com.model.Fines.Fine;
 import com.model.Fines.InfractionType;
-import com.view.Reports.FinesWindow;
 import com.controller.RegistryNotifier;
 
 import java.io.Serial;
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 public abstract class FineIssuerDevice extends Device{
     @Serial
     private static final long serialVersionUID = 7716519194965191290L;
-    private InfractionType emitedInfractionType;
+    private transient InfractionType emitedInfractionType;
     private transient final RegistryNotifier notifier;
 
     public FineIssuerDevice(String address, Location location,boolean state, InfractionType emitedInfractionType) {
@@ -30,9 +29,9 @@ public abstract class FineIssuerDevice extends Device{
         this.notifier = RegistryNotifier.getNotifier();
     }
 
-    public abstract void setEmitedInfractionType();
+    public abstract void setEmittedInfractionType();
 
-    public void setEmitedInfractionType(InfractionType infractionType){ this.emitedInfractionType = infractionType;}
+    public void setEmittedInfractionType(InfractionType infractionType){ this.emitedInfractionType = infractionType;}
     public InfractionType getEmitedInfractionType() {
         return emitedInfractionType;
     }
@@ -59,6 +58,6 @@ public abstract class FineIssuerDevice extends Device{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Multa");
+
     }
 }

@@ -85,10 +85,9 @@ public class UrbanMonitoringCenter {
         if (fineIssuers.isEmpty()) {
             throw new IllegalStateException("No FineIssuerDevice found in the device list.");
         }
-
         Random random = new Random();
         FineIssuerDevice d = fineIssuers.get(random.nextInt(fineIssuers.size()));
-        System.out.println(d.getDeviceTypeName());
+        d.setEmittedInfractionType();
         return d;
     }
 
@@ -188,6 +187,7 @@ public class UrbanMonitoringCenter {
         UMC.devices.put(plCamera.getId(),plCamera);
 
         UMC.saveDevices("devices.ser");
+        UMC.loadInfractionTypes();
         UMC.startSimulations();
         UMC.startRandomFineSimulation();
         UMC.startRandomFailureSimulation();
@@ -217,7 +217,7 @@ public class UrbanMonitoringCenter {
                     .map(d -> (FineIssuerDevice) d)
                     .toList();
             for(FineIssuerDevice f: fineIssuers){
-                f.setEmitedInfractionType();
+                f.setEmittedInfractionType();
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -227,9 +227,9 @@ public class UrbanMonitoringCenter {
         InfractionTypesDAO dao = new InfractionTypesDAO();
         try {
             List<InfractionType> types = dao.getAllInfractionTypes();
-            for (InfractionType t : types) {
+            for (InfractionType t : types)
                 infractionTypes.put(t.getName(), t);
-            }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -299,28 +299,13 @@ public class UrbanMonitoringCenter {
         FineIssuerDevice device;
         try {
             device = getRandomFineIssuerDevice();
-            System.out.println(device.getDeviceTypeName());
+            Automobile auto = mvr.getRandomAutomobile();
+            if(device.getState() && auto!=null){
+                device.issueFine(auto);
+                System.out.println("Multa emitida por " + device.getAddress() + " a " + auto.getLicensePlate());
+            }
         } catch (IllegalStateException e) {
             System.err.println("No hay dispositivos emisores disponibles.");
-            return;
-        }
-
-        Automobile auto = mvr.getRandomAutomobile();
-        if (auto == null) {
-            System.err.println("No hay autos disponibles.");
-            return;
-        }
-
-        if (!device.getState()) {
-            System.out.println("Dispositivo inoperativo, se salta: " + device.getId());
-            return;
-        }
-
-        try {
-            device.issueFine(auto);
-            System.out.println("Multa emitida por " + device.getAddress() + " a " + auto.getLicensePlate());
-        } catch (RuntimeException e) {
-            System.err.println("Error al emitir multa: " + e.getMessage());
         }
     }
 
@@ -396,7 +381,7 @@ public class UrbanMonitoringCenter {
             TrafficLightController tlc = (TrafficLightController) device;
             // A traffic light controller has a fatal error if either of its lights are UNKNOWN
             return tlc.getIntersectionLights().get(0).getCurrentState() == TrafficLightState.UNKNOWN ||
-                   tlc.getIntersectionLights().get(1).getCurrentState() == TrafficLightState.UNKNOWN;
+                    tlc.getIntersectionLights().get(1).getCurrentState() == TrafficLightState.UNKNOWN;
         }
         // Non-TrafficLight devices cannot have fatal errors, so return false for them.
         return false;

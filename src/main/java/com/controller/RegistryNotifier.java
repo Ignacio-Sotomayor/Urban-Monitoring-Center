@@ -23,6 +23,6 @@ public class RegistryNotifier {
     }
 
     public void updateFinesTable(Fine f){
-        issuedTable.onFineIssued(f);
+        issuedTable.update();
     }
 }

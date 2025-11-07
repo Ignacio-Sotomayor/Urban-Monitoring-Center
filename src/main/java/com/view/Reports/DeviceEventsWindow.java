@@ -52,15 +52,13 @@ public class DeviceEventsWindow extends JFrame {
             }
 
             try {
-                UrbanMonitoringCenter center = UrbanMonitoringCenter.getUrbanMonitoringCenter();
-                Device device = center.getDeviceByAddress(address);
 
-                if (device == null) {
+                if (address != null) {
+                    loadDeviceEvents(String.valueOf(address));
+                }else
                     JOptionPane.showMessageDialog(this, "No device found at this address.");
-                    return;
-                }
 
-                loadDeviceEvents(String.valueOf(device));
+
 
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());

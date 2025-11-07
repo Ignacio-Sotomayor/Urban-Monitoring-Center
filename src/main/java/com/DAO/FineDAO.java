@@ -194,7 +194,7 @@ public class FineDAO {
         return fines;
     }
     public Set<Fine> getNSpecifTypeFineByAutomobileIDBetweenDates(Timestamp InitDate, Timestamp EndDate, int N, int Offset, Integer AutomobileID, Integer InfractionTypeID) throws SQLException{
-        String sql = "SELECT f.* FROM Fines JOIN GeoLocations gl ON f.GeoLocation_ID = gl.GeoLocation_ID WHERE m.Automobile_ID = ? AND m.InfractionType_ID = ? AND gl.GeoLocation_DateTime BETWEEN ? AND ? Limit ? OFFSET ?";
+        String sql = "SELECT * FROM Fines  WHERE Automobile_ID = ? AND InfractionType_ID = ? AND Fine_DateTime BETWEEN ? AND ? Limit ? OFFSET ?";
 
         Set<Fine> fines = new HashSet<>(N);
         Integer FineID;
@@ -216,39 +216,40 @@ public class FineDAO {
             pstmt.setInt(6,Offset);
 
             rs = pstmt.executeQuery();
-        }
-        if(rs != null){
-            InfractionTypesDAO infractionDao = new InfractionTypesDAO();
-            AutomobileDAO automobileDao = new AutomobileDAO();
-            PhotosDAO photoDao = new PhotosDAO();
-            if(InfractionTypeID!=1) {
-                while (rs.next()) {
-                    FineID = rs.getInt("Fine_ID");
-                    timestamp = rs.getTimestamp("Fine_DateTime");
-                    address = rs.getString("Fine_Address");
-                    latitude = rs.getBigDecimal("Fine_Latitude");
-                    longitude = rs.getBigDecimal("Fine_Longitude");
-                    uuid= rs.getString("Issuer_DeviceUUID");
+            if(rs != null){
+                InfractionTypesDAO infractionDao = new InfractionTypesDAO();
+                AutomobileDAO automobileDao = new AutomobileDAO();
+                PhotosDAO photoDao = new PhotosDAO();
+                if(InfractionTypeID!=1) {
+                    while (rs.next()) {
+                        FineID = rs.getInt("Fine_ID");
+                        timestamp = rs.getTimestamp("Fine_DateTime");
+                        address = rs.getString("Fine_Address");
+                        latitude = rs.getBigDecimal("Fine_Latitude");
+                        longitude = rs.getBigDecimal("Fine_Longitude");
+                        uuid= rs.getString("Issuer_DeviceUUID");
 
-                    fines.add(new Fine(FineID, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(InfractionTypeID), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID)));
-                }
-            } else{
-                while (rs.next()) {
-                    FineID = rs.getInt("Fine_ID");
-                    timestamp = rs.getTimestamp("Fine_DateTime");
-                    address = rs.getString("Fine_Address");
-                    latitude = rs.getBigDecimal("Fine_Latitude");
-                    longitude = rs.getBigDecimal("Fine_Longitude");
-                    uuid= rs.getString("Issuer_DeviceUUID");
+                        fines.add(new Fine(FineID, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(InfractionTypeID), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID)));
+                    }
+                } else{
+                    while (rs.next()) {
+                        FineID = rs.getInt("Fine_ID");
+                        timestamp = rs.getTimestamp("Fine_DateTime");
+                        address = rs.getString("Fine_Address");
+                        latitude = rs.getBigDecimal("Fine_Latitude");
+                        longitude = rs.getBigDecimal("Fine_Longitude");
+                        uuid= rs.getString("Issuer_DeviceUUID");
 
-                    fines.add(new ExcessiveSpeedFine(FineID, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(1), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID),rs.getInt("SpeedLimit"), rs.getInt("AutomobileSpeed")));
+                        fines.add(new ExcessiveSpeedFine(FineID, new EventGeolocation(timestamp.toLocalDateTime(),address,new Location(latitude,longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(1), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID),rs.getInt("SpeedLimit"), rs.getInt("AutomobileSpeed")));
+                    }
                 }
             }
         }
+
         return fines;
     }
     public Set<Fine> getNFinesByDeviceUUIDBetweenDates(Timestamp InitDate, Timestamp EndDate, int N, int Offset, @NotNull UUID DeviceUUID) throws SQLException {
-        String sql = "SELECT f.* FROM Fines JOIN GeoLocations gl ON f.GeoLocation_ID = gl.GeoLocation_ID WHERE gl.DeviceUUID = ? AND gl.GeoLocation_DateTime BETWEEN ? AND ? Limit ? OFFSET ?";
+        String sql = "SELECT * FROM Fines  WHERE Issuer_DeviceUUID = ? AND Fine_DateTime BETWEEN ? AND ? Limit ? OFFSET ?";
 
         Set<Fine> fines = new HashSet<>(N);
         Integer FineID, InfractionTypeID, AutomobileID;
@@ -269,8 +270,6 @@ public class FineDAO {
             pstmt.setInt(5,Offset);
 
             rs = pstmt.executeQuery();
-        }
-        if(rs.next()){
             InfractionTypesDAO infractionDao = new InfractionTypesDAO();
             AutomobileDAO automobileDao = new AutomobileDAO();
             PhotosDAO photoDao = new PhotosDAO();
@@ -291,6 +290,7 @@ public class FineDAO {
                     fines.add(new ExcessiveSpeedFine(FineID, new EventGeolocation(timestamp.toLocalDateTime(), address, new Location(latitude, longitude), UrbanMonitoringCenter.getUrbanMonitoringCenter().getSpecificDevice(UUID.fromString(uuid))), infractionDao.getInfractionTypeByID(1), automobileDao.getAutomobileByAutomobileID(AutomobileID), photoDao.getAllPhotosFromFine(FineID), rs.getInt("SpeedLimit"), rs.getInt("AutomobileSpeed")));
             }
         }
+
         return fines;
     }
     public Set<Fine> getAllFinesFromAutomobile(int automobileID)throws SQLException{
@@ -325,7 +325,7 @@ public class FineDAO {
 
     }
     public Iterator<Fine> getNRecentFines(int N) throws SQLException {
-        String sql = "SELECT * FROM Fines Limit ?";
+        String sql = "SELECT * FROM Fines ORDER BY Fine_DateTime DESC Limit ? ";
 
         Set<Fine> fines = new HashSet<>(N);
         Integer FineID, InfractionTypeID, AutomobileID;
